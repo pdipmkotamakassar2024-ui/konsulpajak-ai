@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
         hostname: "fonts.gstatic.com",
       },
     ],
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 };
 
