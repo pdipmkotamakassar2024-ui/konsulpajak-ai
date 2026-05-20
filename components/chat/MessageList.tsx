@@ -1,9 +1,9 @@
 "use client";
 
-import { Message } from "ai";
+import { UIMessage } from "ai";
 
 // For future RAG implementation
-interface ExtendedMessage extends Message {
+interface ExtendedMessage extends UIMessage {
   legalSources?: { name: string; url: string; pasal?: string }[];
 }
 

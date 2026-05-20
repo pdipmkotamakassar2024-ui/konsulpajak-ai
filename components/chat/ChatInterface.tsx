@@ -24,12 +24,13 @@ export default function ChatInterface({ user }: { user: User | null }) {
   }, [activeChatId]);
 
   const chat = useChat({
-    api: "/api/chat",
-    onFinish: async (message) => {
+    onFinish: async (event) => {
       // Save AI message to DB when finished
       const chatId = activeChatIdRef.current;
-      if (chatId && user) {
-        const textContent = message.content || message.text || (Array.isArray(message.parts) ? message.parts.map(p => p.text).join('') : '');
+      if (chatId && user && event.message) {
+        const msg = event.message;
+        // @ts-ignore
+        const textContent = msg.content || msg.text || (Array.isArray(msg.parts) ? msg.parts.map((p: any) => p.text).join('') : '');
         await supabase.from('messages').insert({
           chat_id: chatId,
           role: 'assistant',
