@@ -4,6 +4,8 @@ import { createClient } from "@/utils/supabase/client";
 import { useState } from "react";
 import Link from "next/link";
 
+export const dynamic = 'force-dynamic';
+
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
