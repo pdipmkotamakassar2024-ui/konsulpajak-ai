@@ -5,9 +5,10 @@ import Link from "next/link";
 interface TopBarProps {
   onToggleSidebar: () => void;
   sidebarOpen: boolean;
+  user?: any;
 }
 
-export default function TopBar({ onToggleSidebar, sidebarOpen }: TopBarProps) {
+export default function TopBar({ onToggleSidebar, sidebarOpen, user }: TopBarProps) {
   return (
     <div className="topbar">
       {/* Left: Sidebar toggle */}
@@ -72,39 +73,42 @@ export default function TopBar({ onToggleSidebar, sidebarOpen }: TopBarProps) {
 
       {/* Right: Auth actions */}
       <div className="topbar-actions">
-        <Link href="/auth/login" id="topbar-login-btn" className="topbar-login-btn">
-          Masuk
-        </Link>
-        <Link
-          href="/auth/register"
-          id="topbar-register-btn"
-          style={{
-            padding: "7px 18px",
-            background: "#FFFFFF",
-            border: "1.5px solid var(--border)",
-            borderRadius: "99px",
-            color: "var(--text-secondary)",
-            fontSize: "13px",
-            fontWeight: "600",
-            cursor: "pointer",
-            transition: "all 0.2s ease",
-            textDecoration: "none",
-            display: "flex",
-            alignItems: "center",
-            boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
-          }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLElement).style.borderColor = "var(--primary)";
-            (e.currentTarget as HTMLElement).style.color = "var(--primary-dark)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
-            (e.currentTarget as HTMLElement).style.color = "var(--text-secondary)";
-          }}
-        >
-          Daftar Gratis
-        </Link>
-
+        {!user && (
+          <>
+            <Link href="/login" id="topbar-login-btn" className="topbar-login-btn">
+              Masuk
+            </Link>
+            <Link
+              href="/login"
+              id="topbar-register-btn"
+              style={{
+                padding: "7px 18px",
+                background: "#FFFFFF",
+                border: "1.5px solid var(--border)",
+                borderRadius: "99px",
+                color: "var(--text-secondary)",
+                fontSize: "13px",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "all 0.2s ease",
+                textDecoration: "none",
+                display: "flex",
+                alignItems: "center",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--primary)";
+                (e.currentTarget as HTMLElement).style.color = "var(--primary-dark)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.borderColor = "var(--border)";
+                (e.currentTarget as HTMLElement).style.color = "var(--text-secondary)";
+              }}
+            >
+              Daftar Gratis
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );

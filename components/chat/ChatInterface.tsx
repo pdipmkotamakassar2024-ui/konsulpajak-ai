@@ -145,6 +145,7 @@ export default function ChatInterface({ user }: { user: User | null }) {
         <TopBar
           onToggleSidebar={() => setSidebarOpen((v) => !v)}
           sidebarOpen={sidebarOpen}
+          user={user}
         />
 
         {/* Scrollable chat area */}
