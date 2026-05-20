@@ -1,0 +1,10 @@
+{
+  "buildCommand": "npm run build",
+  "framework": "nextjs",
+  "env": {},
+  "build": {
+    "env": {
+      "NEXT_DISABLE_ESLINT": "1"
+    }
+  }
+}
