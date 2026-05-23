@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 
-const suggestions = [
+export const suggestions = [
   {
     icon: "💼",
     title: "PPh 21 Karyawan",

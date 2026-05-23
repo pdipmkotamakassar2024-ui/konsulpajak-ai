@@ -140,6 +140,7 @@ export default function ChatInterface({ user }: { user: User | null }) {
         onClose={() => setSidebarOpen(false)}
         onNewChat={handleNewChat}
         onSelectChat={loadChat}
+        onPromptClick={handleSend}
         user={user}
       />
 
