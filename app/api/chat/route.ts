@@ -67,8 +67,8 @@ export async function POST(req: Request) {
     });
   }
 
-  // Use convertToCoreMessages to properly handle attachments and text
-  const messages = convertToModelMessages ? convertToModelMessages(rawMessages) : rawMessages;
+  // Use convertToModelMessages to properly handle attachments and text (it returns a Promise)
+  const messages = convertToModelMessages ? await convertToModelMessages(rawMessages) : rawMessages;
 
   const result = streamText({
     model: google('gemini-2.5-flash'),

@@ -53,28 +53,37 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
     hour < 18 ? "Selamat Sore" : "Selamat Malam";
 
   return (
-    <div className="welcome-container">
+    <div className="welcome-container" style={{
+      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "70vh", // To ensure it centers within the scroll area
+      paddingTop: 0,
+    }}>
       {/* Animated logo */}
-      <div className="welcome-logo-wrapper animate-fade-up" style={{ marginBottom: "24px" }}>
-        <div className="welcome-logo-ring-2" />
-        <div className="welcome-logo-ring" />
+      <div className="welcome-logo-wrapper animate-fade-up" style={{ marginBottom: "32px" }}>
+        <div className="welcome-logo-ring-2" style={{ width: "160px", height: "160px" }} />
+        <div className="welcome-logo-ring" style={{ width: "140px", height: "140px" }} />
         <Image
           src="/logo-icon.jpeg"
           alt="KonsulPajak AI"
-          width={88}
-          height={88}
+          width={120}
+          height={120}
           className="welcome-logo-img"
+          style={{ width: "120px", height: "120px" }}
           priority
         />
       </div>
 
       {/* Greeting */}
-      <h1 className="welcome-greeting animate-fade-up-1" style={{ marginBottom: "10px" }}>
+      <h1 className="welcome-greeting animate-fade-up-1" style={{ marginBottom: "12px", fontSize: "36px" }}>
         {greeting}! 👋 Saya{" "}
         <span>KonsulPajak AI</span>
       </h1>
 
-      <p className="welcome-subtitle animate-fade-up-2" style={{ marginBottom: "32px" }}>
+      <p className="welcome-subtitle animate-fade-up-2" style={{ marginBottom: "40px", fontSize: "18px" }}>
         Asisten Konsultan Pajak Coretax Anda.
       </p>
 

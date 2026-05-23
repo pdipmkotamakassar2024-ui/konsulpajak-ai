@@ -101,9 +101,9 @@ export default function Sidebar({ isOpen, onClose, onNewChat, onSelectChat, onPr
             <Image
               src="/logo-navbar.png"
               alt="KonsulPajak AI"
-              width={200}
-              height={55}
-              style={{ height: "46px", width: "auto", objectFit: "contain" }}
+              width={240}
+              height={65}
+              style={{ height: "56px", width: "auto", objectFit: "contain" }}
               priority
             />
           </Link>
