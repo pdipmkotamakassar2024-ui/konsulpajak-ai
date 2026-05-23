@@ -160,7 +160,7 @@ export default function Sidebar({ isOpen, onClose, onNewChat, onSelectChat, user
                 {user ? (user.user_metadata?.name || user.email) : "Pengguna Tamu"}
               </div>
               <div style={{ fontSize: "11px", color: "var(--text-faint)" }}>
-                {user ? "Paket Gratis · 10/10" : "Belum Login"}
+                {user ? "Paket Gratis · Maks 5 Prompt" : "Belum Login"}
               </div>
             </div>
             {user ? (

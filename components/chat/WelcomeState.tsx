@@ -75,9 +75,7 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
       </h1>
 
       <p className="welcome-subtitle animate-fade-up-2" style={{ marginBottom: "32px" }}>
-        Konsultan pajak pribadi berbasis AI untuk UMKM & Profesional Indonesia.
-        <br />
-        Berbasis aturan resmi DJP — dijelaskan dengan bahasa manusia.
+        Asisten Konsultan Pajak Coretax Anda.
       </p>
 
       {/* Suggestions grid */}
@@ -110,7 +108,6 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
         }}
       >
         {[
-          { icon: "🔒", text: "Enkripsi AES-256" },
           { icon: "📚", text: ">10.000 Peraturan DJP" },
           { icon: "⚡", text: "Jawaban < 3 Detik" },
         ].map((b) => (
@@ -129,6 +126,9 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
           </div>
         ))}
       </div>
+      <p style={{ marginTop: "12px", fontSize: "11px", color: "var(--text-faint)", textAlign: "center", width: "100%" }}>
+        Berdasarkan peraturan resmi DJP & Sistem Coretax.
+      </p>
     </div>
   );
 }

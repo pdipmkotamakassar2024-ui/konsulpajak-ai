@@ -51,24 +51,6 @@ export default function TopBar({ onToggleSidebar, sidebarOpen, user }: TopBarPro
           </svg>
         </div>
 
-        {/* DB badge */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "5px",
-          padding: "4px 10px",
-          background: "rgba(16,185,129,0.08)",
-          border: "1px solid rgba(16,185,129,0.2)",
-          borderRadius: "99px",
-          fontSize: "11.5px",
-          color: "#34D399",
-          fontWeight: "500",
-        }}>
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-          </svg>
-          Database DJP Aktif
-        </div>
       </div>
 
       {/* Right: Auth actions */}

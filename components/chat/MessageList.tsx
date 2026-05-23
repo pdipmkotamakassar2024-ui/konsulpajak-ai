@@ -9,31 +9,102 @@ interface ExtendedMessage extends UIMessage {
 
 function formatContent(text: string) {
   // Simple markdown-like formatting
-  return text
-    .split("\n")
-    .map((line, i) => {
-      // Bold
-      const parts = line.split(/(\*\*.*?\*\*)/g).map((part, j) => {
-        if (part.startsWith("**") && part.endsWith("**")) {
-          return <strong key={j}>{part.slice(2, -2)}</strong>;
-        }
-        return part;
-      });
+  const lines = text.split("\n");
+  const result: React.ReactNode[] = [];
+  
+  let i = 0;
+  while (i < lines.length) {
+    let line = lines[i];
 
-      // Bullet points
-      if (line.trim().startsWith("•") || line.trim().startsWith("-")) {
-        return (
-          <div key={i} style={{ display: "flex", gap: "8px", marginTop: "2px" }}>
-            <span style={{ color: "var(--primary-light)", flexShrink: 0 }}>•</span>
-            <span>{parts}</span>
+    // Check for Markdown Alerts like > [!NOTE], > [!WARNING], > [!IMPORTANT]
+    if (line.trim().startsWith("> [!")) {
+      const typeMatch = line.match(/> \[!(.*?)\]/);
+      if (typeMatch) {
+        const type = typeMatch[1]; // NOTE, WARNING, IMPORTANT
+        
+        let bgColor = "rgba(30, 144, 255, 0.1)";
+        let borderColor = "rgba(30, 144, 255, 0.3)";
+        let textColor = "var(--primary-light)";
+        let icon = "💡";
+        
+        if (type === "WARNING") {
+          bgColor = "rgba(245, 158, 11, 0.1)";
+          borderColor = "rgba(245, 158, 11, 0.3)";
+          textColor = "#fcd34d";
+          icon = "⚠️";
+        } else if (type === "IMPORTANT") {
+          bgColor = "rgba(16, 185, 129, 0.1)";
+          borderColor = "rgba(16, 185, 129, 0.3)";
+          textColor = "#6ee7b7";
+          icon = "📄";
+        }
+
+        // Gather all lines inside the blockquote
+        let contentLines = [];
+        i++; // skip the [!TYPE] line
+        while (i < lines.length && lines[i].trim().startsWith(">")) {
+          contentLines.push(lines[i].replace(/^>\s?/, ""));
+          i++;
+        }
+
+        result.push(
+          <div key={`alert-${i}`} style={{
+            background: bgColor,
+            borderLeft: `4px solid ${borderColor}`,
+            padding: "16px",
+            margin: "12px 0",
+            borderRadius: "0 8px 8px 0",
+            color: "var(--text-primary)"
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", color: textColor, fontWeight: "600", fontSize: "14px" }}>
+              <span>{icon}</span> {type}
+            </div>
+            <div style={{ fontSize: "14px", lineHeight: "1.6" }}>
+              {contentLines.map((cl, cli) => (
+                <div key={cli}>{cl}</div>
+              ))}
+            </div>
           </div>
         );
+        continue; // Skip the regular parsing for these lines
       }
+    }
 
-      if (line === "") return <div key={i} style={{ height: "8px" }} />;
-
-      return <div key={i}>{parts}</div>;
+    // Bold
+    const parts = line.split(/(\*\*.*?\*\*)/g).map((part, j) => {
+      if (part.startsWith("**") && part.endsWith("**")) {
+        return <strong key={j}>{part.slice(2, -2)}</strong>;
+      }
+      return part;
     });
+
+    // Bullet points
+    if (line.trim().startsWith("•") || line.trim().startsWith("- ")) {
+      result.push(
+        <div key={i} style={{ display: "flex", gap: "8px", marginTop: "2px" }}>
+          <span style={{ color: "var(--primary-light)", flexShrink: 0 }}>•</span>
+          <span>{line.replace(/^[-•]\s*/, "").split(/(\*\*.*?\*\*)/g).map((part, j) => {
+            if (part.startsWith("**") && part.endsWith("**")) {
+              return <strong key={j}>{part.slice(2, -2)}</strong>;
+            }
+            return part;
+          })}</span>
+        </div>
+      );
+      i++;
+      continue;
+    }
+
+    if (line === "") {
+      result.push(<div key={i} style={{ height: "8px" }} />);
+    } else {
+      result.push(<div key={i}>{parts}</div>);
+    }
+    
+    i++;
+  }
+
+  return result;
 }
 
 function getMessageText(msg: any): string {

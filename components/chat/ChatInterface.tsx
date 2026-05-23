@@ -87,14 +87,14 @@ export default function ChatInterface({ user }: { user: User | null }) {
     if (window.innerWidth < 768) setSidebarOpen(false);
   };
 
-  const handleSend = async (content: string) => {
-    if (!content.trim() || isLoading) return;
+  const handleSend = async (content: string, files?: File[]) => {
+    if ((!content.trim() && (!files || files.length === 0)) || isLoading) return;
     
     let currentChatId = activeChatId;
     
     // Create new chat if this is the first message
     if (!currentChatId && user) {
-      const title = content.substring(0, 50) + (content.length > 50 ? "..." : "");
+      const title = content ? content.substring(0, 50) + (content.length > 50 ? "..." : "") : "Konsultasi Gambar";
       const { data } = await supabase.from('chats').insert({
         user_id: user.id,
         title: title
@@ -107,19 +107,25 @@ export default function ChatInterface({ user }: { user: User | null }) {
       }
     }
 
-    // Save user message to database
-    if (currentChatId && user) {
+    // Save user message to database (without the image data for now to save space, or just text)
+    if (currentChatId && user && content) {
       await supabase.from('messages').insert({
         chat_id: currentChatId,
         role: 'user',
-        content: content
+        content: content + (files?.length ? ' [Mengirim lampiran gambar]' : '')
       });
     }
 
-    if (sendMessage) {
-      sendMessage({ text: content });
+    // Send to AI SDK using append
+    if (chat.append) {
+      chat.append({ 
+        role: 'user', 
+        content: content || "Tolong analisis gambar ini.",
+        // experimental_attachments allows File objects in AI SDK v3.1+
+        experimental_attachments: files
+      });
     } else {
-      console.error("No sendMessage function found in useChat.");
+      console.error("No append function found in useChat.");
     }
   };
 
