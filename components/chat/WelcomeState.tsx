@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Image from "next/image";
 
 export const suggestions = [
@@ -46,11 +47,16 @@ interface WelcomeStateProps {
 }
 
 export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
-  const hour = new Date().getHours();
-  const greeting =
-    hour < 12 ? "Selamat Pagi" :
-    hour < 15 ? "Selamat Siang" :
-    hour < 18 ? "Selamat Sore" : "Selamat Malam";
+  const [greeting, setGreeting] = useState("Selamat Pagi");
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    setGreeting(
+      hour < 12 ? "Selamat Pagi" :
+      hour < 15 ? "Selamat Siang" :
+      hour < 18 ? "Selamat Sore" : "Selamat Malam"
+    );
+  }, []);
 
   return (
     <div className="welcome-container" style={{
@@ -67,7 +73,7 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
         <div className="welcome-logo-ring-2" style={{ width: "160px", height: "160px" }} />
         <div className="welcome-logo-ring" style={{ width: "140px", height: "140px" }} />
         <Image
-          src="/logo-tengah.png"
+          src="/logo-icon.jpeg"
           alt="KonsulPajak AI"
           width={120}
           height={120}
