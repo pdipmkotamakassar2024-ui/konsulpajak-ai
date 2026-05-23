@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Image from "next/image";
 
 export const suggestions = [
@@ -41,17 +40,6 @@ interface WelcomeStateProps {
 }
 
 export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
-  const [greeting, setGreeting] = useState("Selamat Pagi");
-
-  useEffect(() => {
-    const hour = new Date().getHours();
-    setGreeting(
-      hour < 12 ? "Selamat Pagi" :
-      hour < 15 ? "Selamat Siang" :
-      hour < 18 ? "Selamat Sore" : "Selamat Malam"
-    );
-  }, []);
-
   return (
     <div className="welcome-container" style={{
       flex: 1,
@@ -79,7 +67,7 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
 
       {/* Greeting */}
       <h1 className="welcome-greeting animate-fade-up-1" style={{ marginBottom: "12px", fontSize: "36px" }}>
-        {greeting}! 👋 Saya{" "}
+        Selamat Datang! 👋 Saya{" "}
         <span>KonsulPajak AI</span>
       </h1>
 

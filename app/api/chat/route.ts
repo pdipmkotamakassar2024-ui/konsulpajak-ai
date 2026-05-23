@@ -114,5 +114,25 @@ Jika pengguna melampirkan gambar/faktur, analisis dokumen tersebut secara langsu
     messages,
   });
 
-  return result.toTextStreamResponse();
+  const encoder = new TextEncoder();
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        for await (const chunk of result.textStream) {
+          controller.enqueue(encoder.encode(`0:${JSON.stringify(chunk)}\n`));
+        }
+      } catch (e) {
+        console.error("Stream error:", e);
+      } finally {
+        controller.close();
+      }
+    },
+  });
+
+  return new Response(stream, {
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+      'x-vercel-ai-data-stream': 'v1',
+    },
+  });
 }
