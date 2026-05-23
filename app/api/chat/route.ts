@@ -6,7 +6,8 @@ export const maxDuration = 30;
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const rawMessages = body.messages;
+  console.log("INCOMING BODY:", body);
+  const rawMessages = body.messages || [];
   
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -67,8 +68,20 @@ export async function POST(req: Request) {
     });
   }
 
+  // Sanitize messages to prevent "Cannot read properties of undefined (reading 'map')" in convertToModelMessages
+  const sanitizedMessages = rawMessages.map((msg: any) => {
+    if (msg.role === 'user') {
+      return {
+        ...msg,
+        experimental_attachments: msg.experimental_attachments || [],
+        parts: msg.parts || [{ type: 'text', text: msg.content || '' }]
+      };
+    }
+    return msg;
+  });
+
   // Use convertToModelMessages to properly handle attachments and text (it returns a Promise)
-  const messages = convertToModelMessages ? await convertToModelMessages(rawMessages) : rawMessages;
+  const messages = convertToModelMessages ? await convertToModelMessages(sanitizedMessages) : sanitizedMessages;
 
   const result = streamText({
     model: google('gemini-2.5-flash'),
@@ -101,5 +114,5 @@ Jika pengguna melampirkan gambar/faktur, analisis dokumen tersebut secara langsu
     messages,
   });
 
-  return result.toDataStreamResponse();
+  return result.toTextStreamResponse();
 }

@@ -67,7 +67,7 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
         <div className="welcome-logo-ring-2" style={{ width: "160px", height: "160px" }} />
         <div className="welcome-logo-ring" style={{ width: "140px", height: "140px" }} />
         <Image
-          src="/logo-icon.jpeg"
+          src="/logo-tengah.png"
           alt="KonsulPajak AI"
           width={120}
           height={120}
