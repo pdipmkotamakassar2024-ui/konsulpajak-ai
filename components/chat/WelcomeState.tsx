@@ -78,22 +78,7 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
         Asisten Konsultan Pajak Coretax Anda.
       </p>
 
-      {/* Suggestions grid */}
-      <div className="suggestions-grid animate-fade-up-3" style={{ animationDelay: "0.2s" }}>
-        {suggestions.map((s, i) => (
-          <button
-            key={s.title}
-            id={`suggestion-${i}`}
-            className="suggestion-card"
-            onClick={() => onPromptClick(s.prompt)}
-            style={{ animationDelay: `${0.1 * i}s` }}
-          >
-            <span className="suggestion-icon">{s.icon}</span>
-            <span className="suggestion-title">{s.title}</span>
-            <span className="suggestion-desc">{s.desc}</span>
-          </button>
-        ))}
-      </div>
+      {/* Suggestions grid removed per user request (moved to sidebar) */}
 
       {/* Trust badges */}
       <div
