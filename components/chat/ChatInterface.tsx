@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useChat } from "@ai-sdk/react";
+import { TextStreamChatTransport } from "ai";
 import Sidebar from "./Sidebar";
 import TopBar from "./TopBar";
 import WelcomeState from "./WelcomeState";
@@ -24,18 +25,21 @@ export default function ChatInterface({ user }: { user: User | null }) {
   }, [activeChatId]);
 
   const chat = useChat({
+    transport: new TextStreamChatTransport({ api: '/api/chat' }),
     onFinish: async (event) => {
       // Save AI message to DB when finished
       const chatId = activeChatIdRef.current;
       if (chatId && user && event.message) {
         const msg = event.message;
         // @ts-ignore
-        const textContent = msg.content || msg.text || (Array.isArray(msg.parts) ? msg.parts.map((p: any) => p.text).join('') : '');
-        await supabase.from('messages').insert({
-          chat_id: chatId,
-          role: 'assistant',
-          content: textContent
-        });
+        const textContent = typeof msg.content === 'string' ? msg.content : (Array.isArray((msg as any).parts) ? (msg as any).parts.filter((p: any) => p.type === 'text').map((p: any) => p.text).join('') : '');
+        if (textContent) {
+          await supabase.from('messages').insert({
+            chat_id: chatId,
+            role: 'assistant',
+            content: textContent
+          });
+        }
       }
     }
   });
