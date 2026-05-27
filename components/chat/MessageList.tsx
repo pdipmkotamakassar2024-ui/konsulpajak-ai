@@ -7,104 +7,110 @@ interface ExtendedMessage extends UIMessage {
   legalSources?: { name: string; url: string; pasal?: string }[];
 }
 
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+
 function formatContent(text: string) {
-  // Simple markdown-like formatting
-  const lines = text.split("\n");
-  const result: React.ReactNode[] = [];
-  
-  let i = 0;
-  while (i < lines.length) {
-    let line = lines[i];
+  // Use ReactMarkdown to properly parse asterisks, bold, italics, tables, and lists
+  // and prevent raw unique characters from showing.
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        blockquote: ({ node, children, ...props }) => {
+          // Check if this is a GitHub style alert (e.g. > [!NOTE], > [!WARNING], > [!IMPORTANT])
+          let contentStr = "";
+          if (children && Array.isArray(children)) {
+            children.forEach((child: any) => {
+              if (typeof child === "string") contentStr += child;
+              else if (child && child.props && child.props.children) {
+                if (typeof child.props.children === "string") contentStr += child.props.children;
+                else if (Array.isArray(child.props.children)) contentStr += child.props.children.join("");
+              }
+            });
+          } else if (typeof children === "string") {
+            contentStr = children;
+          }
 
-    // Check for Markdown Alerts like > [!NOTE], > [!WARNING], > [!IMPORTANT]
-    if (line.trim().startsWith("> [!")) {
-      const typeMatch = line.match(/> \[!(.*?)\]/);
-      if (typeMatch) {
-        const type = typeMatch[1]; // NOTE, WARNING, IMPORTANT
-        
-        let bgColor = "rgba(30, 144, 255, 0.1)";
-        let borderColor = "rgba(30, 144, 255, 0.3)";
-        let textColor = "var(--primary-light)";
-        let icon = "💡";
-        
-        if (type === "WARNING") {
-          bgColor = "rgba(245, 158, 11, 0.1)";
-          borderColor = "rgba(245, 158, 11, 0.3)";
-          textColor = "#fcd34d";
-          icon = "⚠️";
-        } else if (type === "IMPORTANT") {
-          bgColor = "rgba(16, 185, 129, 0.1)";
-          borderColor = "rgba(16, 185, 129, 0.3)";
-          textColor = "#6ee7b7";
-          icon = "📄";
-        }
+          const isNote = contentStr.includes("[!NOTE]");
+          const isWarning = contentStr.includes("[!WARNING]");
+          const isImportant = contentStr.includes("[!IMPORTANT]");
 
-        // Gather all lines inside the blockquote
-        let contentLines = [];
-        i++; // skip the [!TYPE] line
-        while (i < lines.length && lines[i].trim().startsWith(">")) {
-          contentLines.push(lines[i].replace(/^>\s?/, ""));
-          i++;
-        }
+          if (isNote || isWarning || isImportant) {
+            let bgColor = "rgba(30, 144, 255, 0.1)";
+            let borderColor = "rgba(30, 144, 255, 0.3)";
+            let textColor = "var(--primary-light)";
+            let icon = "💡";
+            let type = "NOTE";
 
-        result.push(
-          <div key={`alert-${i}`} style={{
-            background: bgColor,
-            borderLeft: `4px solid ${borderColor}`,
-            padding: "16px",
-            margin: "12px 0",
-            borderRadius: "0 8px 8px 0",
-            color: "var(--text-primary)"
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", color: textColor, fontWeight: "600", fontSize: "14px" }}>
-              <span>{icon}</span> {type}
-            </div>
-            <div style={{ fontSize: "14px", lineHeight: "1.6" }}>
-              {contentLines.map((cl, cli) => (
-                <div key={cli}>{cl}</div>
-              ))}
-            </div>
-          </div>
-        );
-        continue; // Skip the regular parsing for these lines
-      }
-    }
-
-    // Bold
-    const parts = line.split(/(\*\*.*?\*\*)/g).map((part, j) => {
-      if (part.startsWith("**") && part.endsWith("**")) {
-        return <strong key={j}>{part.slice(2, -2)}</strong>;
-      }
-      return part;
-    });
-
-    // Bullet points
-    if (line.trim().startsWith("•") || line.trim().startsWith("- ")) {
-      result.push(
-        <div key={i} style={{ display: "flex", gap: "8px", marginTop: "2px" }}>
-          <span style={{ color: "var(--primary-light)", flexShrink: 0 }}>•</span>
-          <span>{line.replace(/^[-•]\s*/, "").split(/(\*\*.*?\*\*)/g).map((part, j) => {
-            if (part.startsWith("**") && part.endsWith("**")) {
-              return <strong key={j}>{part.slice(2, -2)}</strong>;
+            if (isWarning) {
+              bgColor = "rgba(245, 158, 11, 0.1)";
+              borderColor = "rgba(245, 158, 11, 0.3)";
+              textColor = "#fcd34d";
+              icon = "⚠️";
+              type = "WARNING";
+            } else if (isImportant) {
+              bgColor = "rgba(16, 185, 129, 0.1)";
+              borderColor = "rgba(16, 185, 129, 0.3)";
+              textColor = "#6ee7b7";
+              icon = "📄";
+              type = "IMPORTANT";
             }
-            return part;
-          })}</span>
-        </div>
-      );
-      i++;
-      continue;
-    }
 
-    if (line === "") {
-      result.push(<div key={i} style={{ height: "8px" }} />);
-    } else {
-      result.push(<div key={i}>{parts}</div>);
-    }
-    
-    i++;
-  }
+            // Extract the actual content without the tag
+            let parsedChildren: any = React.Children.map(children, (child: any) => {
+              if (typeof child === "string") {
+                return child.replace(/\[!(NOTE|WARNING|IMPORTANT)\]/, "");
+              } else if (child && child.props && child.props.children) {
+                if (typeof child.props.children === "string") {
+                  return React.cloneElement(child, {}, child.props.children.replace(/\[!(NOTE|WARNING|IMPORTANT)\]/, ""));
+                }
+              }
+              return child;
+            });
 
-  return result;
+            return (
+              <div style={{
+                background: bgColor,
+                borderLeft: `4px solid ${borderColor}`,
+                padding: "16px",
+                margin: "12px 0",
+                borderRadius: "0 8px 8px 0",
+                color: "var(--text-primary)"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", color: textColor, fontWeight: "600", fontSize: "14px" }}>
+                  <span>{icon}</span> {type}
+                </div>
+                <div style={{ fontSize: "14px", lineHeight: "1.6" }}>
+                  {parsedChildren}
+                </div>
+              </div>
+            );
+          }
+
+          // Normal blockquote
+          return <blockquote {...props} style={{ borderLeft: "4px solid var(--border)", paddingLeft: "16px", color: "var(--text-secondary)", margin: "12px 0", fontStyle: "italic" }}>{children}</blockquote>;
+        },
+        a: ({ node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" style={{ color: "var(--primary-light)", textDecoration: "underline", textUnderlineOffset: "4px" }} />,
+        ul: ({ node, ...props }) => <ul {...props} style={{ paddingLeft: "20px", margin: "12px 0", display: "flex", flexDirection: "column", gap: "8px" }} />,
+        ol: ({ node, ...props }) => <ol {...props} style={{ paddingLeft: "20px", margin: "12px 0", display: "flex", flexDirection: "column", gap: "8px" }} />,
+        li: ({ node, ...props }) => <li {...props} style={{ lineHeight: "1.6" }} />,
+        h1: ({ node, ...props }) => <h1 {...props} style={{ fontSize: "20px", fontWeight: "700", marginTop: "24px", marginBottom: "12px" }} />,
+        h2: ({ node, ...props }) => <h2 {...props} style={{ fontSize: "18px", fontWeight: "600", marginTop: "20px", marginBottom: "10px" }} />,
+        h3: ({ node, ...props }) => <h3 {...props} style={{ fontSize: "16px", fontWeight: "600", marginTop: "16px", marginBottom: "8px" }} />,
+        p: ({ node, ...props }) => <p {...props} style={{ marginBottom: "12px", lineHeight: "1.6" }} />,
+        table: ({ node, ...props }) => (
+          <div style={{ overflowX: "auto", margin: "16px 0" }}>
+            <table {...props} style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }} />
+          </div>
+        ),
+        th: ({ node, ...props }) => <th {...props} style={{ border: "1px solid var(--border)", padding: "8px 12px", background: "rgba(255,255,255,0.05)", textAlign: "left" }} />,
+        td: ({ node, ...props }) => <td {...props} style={{ border: "1px solid var(--border)", padding: "8px 12px" }} />,
+      }}
+    >
+      {text}
+    </ReactMarkdown>
+  );
 }
 
 function getMessageText(msg: any): string {
