@@ -7,6 +7,7 @@ interface ExtendedMessage extends UIMessage {
   legalSources?: { name: string; url: string; pasal?: string }[];
 }
 
+import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
