@@ -39,6 +39,7 @@ const tools = [
     ),
     label: "Deadline Pajak",
     href: "/deadline",
+    comingSoon: true,
   },
 ];
 
@@ -131,12 +132,28 @@ export default function Sidebar({ isOpen, onClose, onNewChat, onSelectChat, onPr
 
           {/* Tools */}
           <div className="sidebar-section-label">Alat Bantu</div>
-          {tools.map((tool) => (
-            <Link key={tool.id} href={tool.href} className="sidebar-tool-item" id={`sidebar-tool-${tool.id}`}>
-              <span style={{ color: "var(--primary-light)", flexShrink: 0 }}>{tool.icon}</span>
-              {tool.label}
-            </Link>
-          ))}
+          {tools.map((tool) => 
+            tool.comingSoon ? (
+              <div key={tool.id} className="sidebar-tool-item" id={`sidebar-tool-${tool.id}`}
+                style={{ opacity: 0.6, cursor: 'default', justifyContent: 'space-between' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
+                  <span style={{ color: "var(--primary-light)", flexShrink: 0 }}>{tool.icon}</span>
+                  {tool.label}
+                </span>
+                <span style={{
+                  fontSize: '9px', fontWeight: '700', color: '#fff',
+                  background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                  padding: '2px 7px', borderRadius: '99px', letterSpacing: '0.04em',
+                  flexShrink: 0, textTransform: 'uppercase'
+                }}>Segera</span>
+              </div>
+            ) : (
+              <Link key={tool.id} href={tool.href} className="sidebar-tool-item" id={`sidebar-tool-${tool.id}`}>
+                <span style={{ color: "var(--primary-light)", flexShrink: 0 }}>{tool.icon}</span>
+                {tool.label}
+              </Link>
+            )
+          )}
 
           <div className="sidebar-divider" />
 

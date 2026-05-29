@@ -114,11 +114,19 @@ function formatContent(text: string) {
 }
 
 function getMessageText(msg: any): string {
-  if (typeof msg.content === 'string') return msg.content;
-  if (typeof msg.text === 'string') return msg.text;
-  if (Array.isArray(msg.parts)) {
-    return msg.parts.map((p: any) => p.text || '').join('');
+  // SDK v6 (TextStreamChatTransport): text is stored in parts[] with type='text'
+  // Check parts FIRST — content may be empty string even when parts has the real text
+  if (Array.isArray(msg.parts) && msg.parts.length > 0) {
+    const fromParts = msg.parts
+      .filter((p: any) => p.type === 'text')
+      .map((p: any) => p.text || '')
+      .join('');
+    if (fromParts) return fromParts;
   }
+  // Fallback: direct content string
+  if (typeof msg.content === 'string' && msg.content.trim()) return msg.content;
+  // Last resort
+  if (typeof msg.text === 'string' && msg.text.trim()) return msg.text;
   return '';
 }
 
