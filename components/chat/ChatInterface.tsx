@@ -96,6 +96,16 @@ export default function ChatInterface({ user }: { user: User | null }) {
     
     let currentChatId = activeChatId;
     
+    // GUEST LIMIT CHECK (Max 2 questions)
+    if (!user) {
+      const guestMsgCount = parseInt(localStorage.getItem('guestMsgCount') || '0');
+      if (guestMsgCount >= 2) {
+         window.alert("Batas akses gratis untuk pengguna tamu telah habis (Maks. 2 kali). Silakan login atau daftar secara gratis untuk melanjutkan konsultasi.");
+         return;
+      }
+      localStorage.setItem('guestMsgCount', (guestMsgCount + 1).toString());
+    }
+    
     // Create new chat if this is the first message
     if (!currentChatId && user) {
       const title = content ? content.substring(0, 50) + (content.length > 50 ? "..." : "") : "Konsultasi Gambar";

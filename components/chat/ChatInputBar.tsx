@@ -128,14 +128,22 @@ export default function ChatInputBar({ onSend, isLoading }: ChatInputBarProps) {
           maxWidth: '760px', width: '100%', marginBottom: '12px',
           padding: '0 12px'
         }}>
-          {previews.map((previewUrl, i) => (
+          {previews.map((previewUrl, i) => {
+            const isImage = files[i]?.type.startsWith('image/');
+            return (
             <div key={i} style={{ 
               position: 'relative', width: '64px', height: '64px', 
               borderRadius: '8px', overflow: 'hidden',
               boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
               border: '1px solid var(--border)'
             }}>
-              <Image src={previewUrl} alt={`Preview ${i}`} fill style={{ objectFit: 'cover' }} />
+              {isImage ? (
+                <Image src={previewUrl} alt={`Preview ${i}`} fill style={{ objectFit: 'cover' }} />
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', fontSize: '10px', textAlign: 'center', padding: '4px', background: 'var(--bg-surface-2)', wordBreak: 'break-word' }}>
+                  📄 {files[i]?.name.slice(0,10) + (files[i]?.name.length > 10 ? '...' : '')}
+                </div>
+              )}
               <button
                 onClick={() => removeFile(i)}
                 style={{
@@ -150,7 +158,8 @@ export default function ChatInputBar({ onSend, isLoading }: ChatInputBarProps) {
                 ✕
               </button>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -160,7 +169,7 @@ export default function ChatInputBar({ onSend, isLoading }: ChatInputBarProps) {
           type="file" 
           ref={fileInputRef} 
           onChange={handleFileSelect} 
-          accept="image/*" 
+          accept="image/*,application/pdf" 
           multiple
           style={{ display: 'none' }}
         />

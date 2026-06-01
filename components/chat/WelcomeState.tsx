@@ -18,8 +18,8 @@ export const suggestions = [
   {
     icon: "📊",
     title: "Lapor SPT Tahunan",
-    desc: "Panduan step-by-step lapor SPT pribadi 2024",
-    prompt: "Bagaimana cara lapor SPT Tahunan orang pribadi untuk tahun pajak 2024? Saya karyawan swasta.",
+    desc: "Panduan step-by-step lapor SPT pribadi 2025/2026",
+    prompt: "Bagaimana cara lapor SPT Tahunan orang pribadi untuk tahun pajak 2025/2026? Saya karyawan swasta.",
   },
   {
     icon: "🏪",
@@ -77,40 +77,6 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
 
       {/* Suggestions grid removed per user request (moved to sidebar) */}
 
-      {/* Trust badges */}
-      <div
-        className="animate-fade-up-3"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "20px",
-          marginTop: "24px",
-          flexWrap: "wrap",
-          justifyContent: "center",
-        }}
-      >
-        {[
-          { icon: "📚", text: ">10.000 Peraturan DJP" },
-          { icon: "⚡", text: "Jawaban < 3 Detik" },
-        ].map((b) => (
-          <div
-            key={b.text}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "6px",
-              fontSize: "12px",
-              color: "var(--text-faint)",
-            }}
-          >
-            <span style={{ fontSize: "14px" }}>{b.icon}</span>
-            {b.text}
-          </div>
-        ))}
-      </div>
-      <p style={{ marginTop: "12px", fontSize: "11px", color: "var(--text-faint)", textAlign: "center", width: "100%" }}>
-        Berdasarkan peraturan resmi DJP & Sistem Coretax.
-      </p>
     </div>
   );
 }

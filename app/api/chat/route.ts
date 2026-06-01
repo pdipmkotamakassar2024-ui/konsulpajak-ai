@@ -35,16 +35,20 @@ export async function POST(req: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // LIMIT LOGIC: Free users are limited to 5 messages.
+  // LIMIT LOGIC: Free users are limited to 20 messages per day.
   if (user) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     const { count } = await supabase
       .from('messages')
       .select('*', { count: 'exact', head: true })
-      .eq('role', 'user');
+      .eq('role', 'user')
+      .gte('created_at', today.toISOString());
       
-    if (count !== null && count >= 5) {
+    if (count !== null && count >= 20) {
       return createTextStream(
-        "**LIMIT TERCAPAI**\n\nMaaf, Anda telah mencapai batas 5 pertanyaan gratis. Untuk melanjutkan konsultasi, analisis dokumen, dan tanya jawab tanpa batas, silakan Upgrade ke Premium di halaman /offline."
+        "**LIMIT HARIAN TERCAPAI**\n\nMaaf, Anda telah mencapai batas 20 pertanyaan gratis untuk hari ini. Silakan kembali besok atau Upgrade ke Premium untuk akses tanpa batas."
       );
     }
   }
@@ -87,7 +91,7 @@ Fokus HANYA pada konteks Indonesia, meliputi:
 - PPh 21, 22, 23, 25/29, 26, dan Final (termasuk UMKM 0.5%)
 - PPN 11% & e-Faktur
 - SPT Tahunan & Masa, e-Filing, SP2DK
-- **Sistem Coretax**: Tinggalkan istilah dan langkah-langkah lawas DJP Online jika sudah digantikan oleh sistem Coretax. Panduan membuat e-Billing, pendaftaran NPWP (sekarang NIK), dan lapor SPT harus merujuk ke modul Coretax.
+- **Sistem Coretax & Tahun 2025/2026**: WAJIB merujuk pada regulasi dan prosedur terbaru tahun pajak 2025/2026. Tinggalkan istilah dan langkah-langkah lawas DJP Online tahun 2024 ke bawah jika sudah digantikan oleh sistem Coretax. Panduan membuat e-Billing, pendaftaran NPWP (sekarang NIK), dan lapor SPT harus merujuk ke modul Coretax yang berlaku saat ini.
 
 ## FORMAT OUTPUT KHUSUS (COLORED OUTPUT)
 Jika pengguna meminta simulasi perhitungan, template surat (SP2DK), atau kesimpulan spesifik yang butuh penekanan visual, gunakan format blockquote peringatan berikut agar aplikasi merendernya dalam boks berwarna elegan:

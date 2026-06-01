@@ -209,24 +209,40 @@ export const FINAL_KOP: Record<string, FinalTaxParam> = {
   },
 };
 
-// --- Kode Objek Pajak for PPh 21 Tidak Final ---
 export interface TidakFinalParam {
   label: string;
   dppFactor: 0.5 | 1;  // 50% or 100% dari bruto
-  hasPTKP: boolean;
 }
 
 export const TIDAK_FINAL_KOP: Record<string, TidakFinalParam> = {
-  "21-100-01": { label: "Tenaga Ahli (Konsultan, Dokter, dll)", dppFactor: 0.5, hasPTKP: true },
-  "21-100-02": { label: "Agen Asuransi / Distributor MLM", dppFactor: 0.5, hasPTKP: true },
-  "21-100-03": { label: "Penjaja Barang Dagangan", dppFactor: 0.5, hasPTKP: true },
-  "21-100-04": { label: "Anggota Dewan Komisaris", dppFactor: 1, hasPTKP: true },
-  "21-100-05": { label: "Mantan Pegawai (Jasa Produksi/Bonus)", dppFactor: 1, hasPTKP: true },
-  "21-100-06": { label: "Peserta Kegiatan/Lomba", dppFactor: 1, hasPTKP: false },
+  "21-100-01": { label: "Tenaga Ahli (Konsultan, Dokter, dll)", dppFactor: 0.5 },
+  "21-100-02": { label: "Agen Asuransi / Distributor MLM", dppFactor: 0.5 },
+  "21-100-03": { label: "Penjaja Barang Dagangan", dppFactor: 0.5 },
+  "21-100-04": { label: "Anggota Dewan Komisaris (Bukan Pegawai)", dppFactor: 1 },
+  "21-100-05": { label: "Mantan Pegawai (Jasa Produksi/Bonus)", dppFactor: 1 },
+  "21-100-06": { label: "Peserta Kegiatan/Lomba", dppFactor: 1 },
 };
 
 // Golongan PNS for dropdown
-export const GOLONGAN_PNS = ["I/a","I/b","I/c","I/d","II/a","II/b","II/c","II/d","III/a","III/b","III/c","III/d","IV/a","IV/b","IV/c","IV/d","IV/e"];
+export const GOLONGAN_PNS_OPTIONS = [
+  { value: "I/a", label: "I/a - Juru Muda (0%)" },
+  { value: "I/b", label: "I/b - Juru Muda Tk. I (0%)" },
+  { value: "I/c", label: "I/c - Juru (0%)" },
+  { value: "I/d", label: "I/d - Juru Tk. I (0%)" },
+  { value: "II/a", label: "II/a - Pengatur Muda (0%)" },
+  { value: "II/b", label: "II/b - Pengatur Muda Tk. I (0%)" },
+  { value: "II/c", label: "II/c - Pengatur (0%)" },
+  { value: "II/d", label: "II/d - Pengatur Tk. I (0%)" },
+  { value: "III/a", label: "III/a - Penata Muda (5%)" },
+  { value: "III/b", label: "III/b - Penata Muda Tk. I (5%)" },
+  { value: "III/c", label: "III/c - Penata (5%)" },
+  { value: "III/d", label: "III/d - Penata Tk. I (5%)" },
+  { value: "IV/a", label: "IV/a - Pembina (15%)" },
+  { value: "IV/b", label: "IV/b - Pembina Tk. I (15%)" },
+  { value: "IV/c", label: "IV/c - Pembina Utama Muda (15%)" },
+  { value: "IV/d", label: "IV/d - Pembina Utama Madya (15%)" },
+  { value: "IV/e", label: "IV/e - Pembina Utama (15%)" }
+];
 
 // ============================================================
 //   Core Calculation Functions
@@ -254,7 +270,7 @@ export function calcPasal17(pkp: number): number {
     remaining -= taxable;
     prevMax = max;
   }
-  return Math.max(0, Math.round(tax));
+  return Math.max(0, Math.floor(tax));
 }
 
 /** Format number as Indonesian Rupiah */

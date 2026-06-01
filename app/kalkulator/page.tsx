@@ -6,7 +6,7 @@ import {
   PTKP,
   FINAL_KOP,
   TIDAK_FINAL_KOP,
-  GOLONGAN_PNS,
+  GOLONGAN_PNS_OPTIONS,
   getTerCategory,
   getTerRate,
   calcPasal17,
@@ -96,7 +96,7 @@ function BulananForm() {
     const brutoNum = parseFloat(bruto.replace(/[^0-9]/g, "")) || 0;
     const category = getTerCategory(ptkp);
     const rate = getTerRate(brutoNum, category);
-    const pph = Math.round(brutoNum * rate);
+    const pph = Math.floor(brutoNum * rate);
 
     setResults([
       { label: "Penghasilan Bruto", value: brutoNum },
@@ -245,9 +245,9 @@ function FinalForm() {
       <InputField label="Penghasilan Bruto" value={bruto} onChange={setBruto} />
       {kop.needsGolongan && (
         <SelectField label="Golongan PNS"
-          options={GOLONGAN_PNS.map(g => ({ value: g, label: g }))}
+          options={GOLONGAN_PNS_OPTIONS}
           value={golongan} onChange={setGolongan}
-          note="Gol I & II = 0%, Gol III = 5%, Gol IV = 15%" />
+          note="Dasar pemotongan: PP No. 80 Tahun 2010" />
       )}
       <button className="kalk-btn" onClick={calculate}>Hitung PPh 21 Final</button>
       {results && (
@@ -267,7 +267,6 @@ function FinalForm() {
 function TidakFinalForm() {
   const [kopKey, setKopKey] = useState(Object.keys(TIDAK_FINAL_KOP)[0]);
   const [bruto, setBruto] = useState("");
-  const [ptkp, setPtkp] = useState("TK/0");
   const [results, setResults] = useState<CalcResult[] | null>(null);
 
   const kop = TIDAK_FINAL_KOP[kopKey];
@@ -275,21 +274,19 @@ function TidakFinalForm() {
   const calculate = useCallback(() => {
     const brutoNum = parseFloat(bruto.replace(/[^0-9]/g, "")) || 0;
     const dpp = Math.round(brutoNum * kop.dppFactor);
-    const ptkpVal = kop.hasPTKP ? PTKP[ptkp] : 0;
-    const pkp = Math.max(0, Math.floor((dpp - ptkpVal) / 1000) * 1000);
+    const pkp = Math.max(0, Math.floor(dpp / 1000) * 1000);
     const pph = calcPasal17(pkp);
 
     setResults([
       { label: "Penghasilan Bruto", value: brutoNum },
       { label: `DPP (${kop.dppFactor * 100}% dari Bruto)`, value: dpp },
-      ...(kop.hasPTKP ? [{ label: `PTKP (${ptkp})`, value: -ptkpVal } as CalcResult] : []),
       { separator: true } as any,
       { label: "PKP (Penghasilan Kena Pajak)", value: pkp },
       { separator: true } as any,
       { label: "PPh 21 Terutang (Pasal 17)", value: pph, highlight: true },
       { label: "Neto Diterima", value: brutoNum - pph },
     ]);
-  }, [bruto, ptkp, kop]);
+  }, [bruto, kop]);
 
   return (
     <div className="kalk-form">
@@ -301,9 +298,6 @@ function TidakFinalForm() {
         <strong>{kop.dppFactor * 100}% dari Bruto</strong>
       </div>
       <InputField label="Penghasilan Bruto" value={bruto} onChange={setBruto} />
-      {kop.hasPTKP && (
-        <SelectField label="Status PTKP" options={PTKP_OPTIONS.map(o => ({ value: o, label: o }))} value={ptkp} onChange={setPtkp} />
-      )}
       <button className="kalk-btn" onClick={calculate}>Hitung PPh 21</button>
       {results && (
         <div className="kalk-results">
