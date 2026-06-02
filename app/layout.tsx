@@ -51,7 +51,7 @@ export default function RootLayout({
   return (
     <html lang="id" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/logo-icon.jpeg" type="image/jpeg" />
+        {/* Next.js automatically injects the icon.png from the app directory */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
