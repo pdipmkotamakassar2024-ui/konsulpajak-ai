@@ -96,11 +96,11 @@ export default function ChatInterface({ user }: { user: User | null }) {
     
     let currentChatId = activeChatId;
     
-    // GUEST LIMIT CHECK (Max 2 questions)
+    // GUEST LIMIT CHECK (Max 10 questions)
     if (!user) {
       const guestMsgCount = parseInt(localStorage.getItem('guestMsgCount') || '0');
-      if (guestMsgCount >= 2) {
-         window.alert("Batas akses gratis untuk pengguna tamu telah habis (Maks. 2 kali). Silakan login atau daftar secara gratis untuk melanjutkan konsultasi.");
+      if (guestMsgCount >= 10) {
+         window.alert("Batas akses gratis untuk pengguna tamu telah habis (Maks. 10 kali). Silakan login atau daftar secara gratis untuk melanjutkan konsultasi.");
          return;
       }
       localStorage.setItem('guestMsgCount', (guestMsgCount + 1).toString());
