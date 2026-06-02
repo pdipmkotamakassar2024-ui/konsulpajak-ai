@@ -35,20 +35,34 @@ export async function POST(req: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // LIMIT LOGIC: Free users are limited to 20 messages per day.
-  if (user) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+  // LIMIT LOGIC: Guests are limited to 10 messages, Logged in to 25 messages per day.
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
+  let limit = user ? 25 : 10;
+  let identifier = user ? user.id : 'guest';
+
+  // We can only reliably count by chat_id or IP for guests. 
+  // Since we don't have IP easily here, we rely on the client preventing it, or if it's stored in DB.
+  // Actually, for logged in users, we can count their messages across all chats.
+  if (user) {
     const { count } = await supabase
       .from('messages')
       .select('*', { count: 'exact', head: true })
       .eq('role', 'user')
       .gte('created_at', today.toISOString());
       
-    if (count !== null && count >= 20) {
+    if (count !== null && count >= limit) {
       return createTextStream(
-        "**LIMIT HARIAN TERCAPAI**\n\nMaaf, Anda telah mencapai batas 20 pertanyaan gratis untuk hari ini. Silakan kembali besok atau Upgrade ke Premium untuk akses tanpa batas."
+        "**LIMIT HARIAN TERCAPAI**\n\nMaaf, Anda telah mencapai batas " + limit + " pertanyaan untuk hari ini. Silakan kembali besok."
+      );
+    }
+  } else {
+    // For guests, we limit per chat session (activeChatId) in the client, but here we can check the db if we had the chat_id.
+    // Let's parse chat_id from messages if available
+    if (rawMessages.length >= limit * 2) { // 1 user + 1 ai per turn
+      return createTextStream(
+        "**LIMIT HARIAN TERCAPAI**\n\nMaaf, Pengguna Tamu dibatasi maksimal " + limit + " pertanyaan. Silakan Daftar Gratis atau Masuk untuk limit yang lebih besar."
       );
     }
   }
@@ -142,6 +156,7 @@ Jika pengguna melampirkan gambar/faktur, analisis dokumen tersebut secara langsu
 
         // If stream ended with no content, the API likely failed silently (e.g. safety filters)
         if (!hasContent) {
+          let specificError = "";
           try {
             // result.response is a promise that may contain error details
             const resp = await Promise.race([
@@ -151,10 +166,18 @@ Jika pengguna melampirkan gambar/faktur, analisis dokumen tersebut secara langsu
             console.error('Silent failure API Response:', resp);
           } catch (e: any) {
             console.error('Silent failure API Error:', e);
+            specificError = String(e?.message || e || "");
           }
-          controller.enqueue(encoder.encode(
-            '⚠️ **Gagal mendapatkan respons dari AI.**\n\nPermintaan Anda mungkin diblokir oleh filter keamanan (Safety Filter) Gemini atau respons kosong.'
-          ));
+          
+          if (specificError) {
+             controller.enqueue(encoder.encode(
+               `⚠️ **Gagal mendapatkan respons dari AI.**\n\nDetail Kesalahan: ${specificError}`
+             ));
+          } else {
+             controller.enqueue(encoder.encode(
+               '⚠️ **Gagal mendapatkan respons dari AI.**\n\nPermintaan Anda mungkin diblokir oleh filter keamanan (Safety Filter) Gemini atau respons kosong.'
+             ));
+          }
         }
 
         controller.close();
