@@ -1,4 +1,4 @@
-import { google } from '@ai-sdk/google';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { streamText, convertToModelMessages } from 'ai';
 import { createClient } from '@/utils/supabase/server';
 
@@ -76,8 +76,13 @@ export async function POST(req: Request) {
       ? await convertToModelMessages(sanitizedMessages)
       : sanitizedMessages;
 
+    // Initialize custom provider to ensure API key is trimmed and explicitly passed
+    const customGoogle = createGoogleGenerativeAI({
+      apiKey: (process.env.GOOGLE_GENERATIVE_AI_API_KEY || '').trim(),
+    });
+
     const result = streamText({
-      model: google('gemini-2.5-flash'),
+      model: customGoogle('gemini-2.5-flash'),
       system: `Anda adalah **KonsulPajak AI** — konsultan pajak cerdas berbasis AI untuk UMKM, karyawan, profesional, dan entitas bisnis di Indonesia. Anda WAJIB sepenuhnya berorientasi pada regulasi terbaru dan sistem **Coretax DJP**. 
 
 ## IDENTITAS & GAYA BAHASA
@@ -119,6 +124,7 @@ Jika pengguna melampirkan gambar/faktur, analisis dokumen tersebut secara langsu
             controller.enqueue(encoder.encode(chunk));
           }
         } catch (error: any) {
+          hasContent = true; // Prevent fallback from running
           console.error('Stream iteration error:', error);
           const raw = String(error?.responseBody || error?.message || error || '');
           let errorMsg = '⚠️ Terjadi kesalahan saat menghubungi AI.';
@@ -126,13 +132,15 @@ Jika pengguna melampirkan gambar/faktur, analisis dokumen tersebut secara langsu
             errorMsg = '⚠️ **API Key Bermasalah** — API Key Gemini telah dinonaktifkan oleh Google karena terdeteksi bocor. Silakan hubungi admin untuk mengganti API key.';
           } else if (raw.includes('quota') || raw.includes('RESOURCE_EXHAUSTED')) {
             errorMsg = '⚠️ **Kuota Habis** — Kuota API Gemini telah terpakai. Silakan coba lagi nanti.';
+          } else if (raw.includes('API key not valid')) {
+            errorMsg = '⚠️ **API Key Tidak Valid** — Kunci API yang dimasukkan salah atau ada kesalahan pengetikan.';
           } else {
-            errorMsg = `⚠️ **Kesalahan:** ${error?.message || 'Gagal menghubungi layanan AI.'}`;
+            errorMsg = `⚠️ **Kesalahan:** ${error?.message || raw || 'Gagal menghubungi layanan AI.'}`;
           }
           controller.enqueue(encoder.encode(errorMsg));
         }
 
-        // If stream ended with no content, the API likely failed silently
+        // If stream ended with no content, the API likely failed silently (e.g. safety filters)
         if (!hasContent) {
           try {
             // result.response is a promise that may contain error details
@@ -140,11 +148,12 @@ Jika pengguna melampirkan gambar/faktur, analisis dokumen tersebut secara langsu
               result.response,
               new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
             ]);
+            console.error('Silent failure API Response:', resp);
           } catch (e: any) {
-            // Ignore - error was already logged by SDK
+            console.error('Silent failure API Error:', e);
           }
           controller.enqueue(encoder.encode(
-            '⚠️ **Gagal mendapatkan respons dari AI.**\n\nKemungkinan penyebab:\n- API Key Gemini sudah tidak aktif / bermasalah\n- Koneksi ke server Google terputus\n\nSilakan hubungi admin untuk memeriksa konfigurasi API Key.'
+            '⚠️ **Gagal mendapatkan respons dari AI.**\n\nPermintaan Anda mungkin diblokir oleh filter keamanan (Safety Filter) Gemini atau respons kosong.'
           ));
         }
 
