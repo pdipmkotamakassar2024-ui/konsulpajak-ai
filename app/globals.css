@@ -277,12 +277,21 @@ body {
   border-bottom: 1px solid #E4EAF2;
   background-color: #FFFFFF;
   flex-shrink: 0;
-  position: relative;
-  z-index: 5;
+  position: fixed; /* Changed to fixed to ensure it stays on top */
+  top: 0;
+  left: var(--sidebar-width); /* Push by sidebar width on desktop */
+  width: calc(100% - var(--sidebar-width));
+  z-index: 50;
   box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
   min-height: var(--topbar-height);
-  width: 100%;
   visibility: visible !important;
+  transition: width 0.3s ease, left 0.3s ease;
+}
+
+/* Adjust topbar when sidebar is closed on desktop */
+.sidebar.closed ~ .main-content .topbar {
+  left: 0;
+  width: 100%;
 }
 
 .topbar-toggle {
@@ -360,15 +369,18 @@ body {
 @media (max-width: 768px) {
   .topbar {
     padding: 0 12px;
+    left: 0 !important;
+    width: 100% !important;
     display: flex !important;
     visibility: visible !important;
   }
   .topbar-center {
     display: none; /* hide center badge on very small screens to save space */
   }
-  /* Hide the "Daftar Gratis" button text on tiny screens, keep Masuk */
-  #topbar-register-btn {
-    display: none !important;
+  /* Keep buttons visible but smaller */
+  .topbar-login-btn, #topbar-register-btn {
+    padding: 5px 12px !important;
+    font-size: 11px !important;
   }
 }
 
@@ -390,6 +402,7 @@ body {
   position: relative;
   z-index: 1;
   background-color: #F4F6FA;
+  padding-top: var(--topbar-height); /* Add padding to account for fixed topbar */
 }
 
 .chat-scroll-area {
