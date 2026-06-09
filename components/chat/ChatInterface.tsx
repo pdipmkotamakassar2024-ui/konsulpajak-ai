@@ -130,14 +130,15 @@ export default function ChatInterface({ user }: { user: User | null }) {
       });
     }
 
-    // Send to AI SDK using sendMessage
-    if (chat.sendMessage) {
-      chat.sendMessage({ 
-        text: content || "Tolong analisis gambar ini.",
-        files: files
+    // Send to AI SDK using append
+    if (chat.append) {
+      chat.append({ 
+        role: 'user',
+        content: content || "Tolong analisis dokumen/gambar ini.",
+        experimental_attachments: files
       });
     } else {
-      console.error("No sendMessage function found in useChat.");
+      console.error("No append function found in useChat.");
     }
   };
 

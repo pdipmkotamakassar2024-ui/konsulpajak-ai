@@ -16,6 +16,7 @@ export default function ChatInputBar({ onSend, isLoading }: ChatInputBarProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
+  const initialValueRef = useRef("");
 
   // Auto-resize textarea
   useEffect(() => {
@@ -94,15 +95,11 @@ export default function ChatInputBar({ onSend, isLoading }: ChatInputBarProps) {
     recognition.interimResults = true;
 
     recognition.onresult = (event: any) => {
-      let finalTranscript = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript + " ";
-        }
+      let transcript = "";
+      for (let i = 0; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
       }
-      if (finalTranscript) {
-        setValue(prev => (prev + " " + finalTranscript).trim());
-      }
+      setValue((initialValueRef.current + " " + transcript).trim());
     };
 
     recognition.onerror = (event: any) => {
@@ -114,6 +111,7 @@ export default function ChatInputBar({ onSend, isLoading }: ChatInputBarProps) {
       setIsRecording(false);
     };
 
+    initialValueRef.current = value;
     recognitionRef.current = recognition;
     recognition.start();
     setIsRecording(true);
