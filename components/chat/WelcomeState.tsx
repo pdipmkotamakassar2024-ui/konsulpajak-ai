@@ -66,9 +66,8 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
       </div>
 
       {/* Greeting */}
-      <h1 className="welcome-greeting animate-fade-up-1" style={{ marginBottom: "12px", fontSize: "36px" }}>
-        Selamat Datang! 👋 Saya{" "}
-        <span>KonsulPajak AI</span>
+      <h1 className="welcome-title animate-fade-up animate-delay-100" style={{ textAlign: "center", marginBottom: "8px" }}>
+        Selamat Datang! <span className="wave-emoji">👋</span> Saya <span style={{ color: "var(--primary)", whiteSpace: "nowrap" }}>KonsulPajak AI</span>
       </h1>
 
       <p className="welcome-subtitle animate-fade-up-2" style={{ marginBottom: "40px", fontSize: "18px" }}>
