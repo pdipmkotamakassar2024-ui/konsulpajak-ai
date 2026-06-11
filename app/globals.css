@@ -5,24 +5,26 @@
    Putih bersih + Biru Elektrik
    ================================================ */
 
-/* CSS Variables */
+/* CSS Variables — Palet warna dari design spec */
 :root {
-  --primary: #1E90FF;
-  --primary-light: #38A3F5;
-  --primary-dark: #1565C0;
-  --primary-subtle: rgba(30, 144, 255, 0.07);
+  --primary: #3B82F6;
+  --primary-light: #60A5FA;
+  --primary-dark: #2563EB;
+  --primary-subtle: rgba(59, 130, 246, 0.07);
+  --indigo: #6366F1;
+  --purple: #8B5CF6;
 
-  --bg-base: #F4F6FA;
+  --bg-base: #F8FAFC;
   --bg-surface: #FFFFFF;
-  --bg-surface-2: #EEF2F8;
+  --bg-surface-2: #EEF4FF;
   --bg-input: #FFFFFF;
   --bg-msg-user: #E8F3FF;
 
   --border: #D0D9E8;
-  --border-blue: rgba(30, 144, 255, 0.3);
+  --border-blue: rgba(59, 130, 246, 0.3);
   --border-subtle: #E4EAF2;
 
-  --text-primary: #0F172A;
+  --text-primary: #0B1B3B;
   --text-secondary: #1E293B;
   --text-muted: #64748B;
   --text-faint: #94A3B8;
@@ -38,8 +40,8 @@
 html { scroll-behavior: smooth; }
 
 body {
-  background-color: #F4F6FA;
-  color: #0F172A;
+  background: linear-gradient(180deg, #F8FAFC 0%, #EEF4FF 100%);
+  color: #0B1B3B;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -60,7 +62,7 @@ body {
   display: flex;
   height: 100vh;
   overflow: hidden;
-  background-color: #F4F6FA;
+  background: linear-gradient(180deg, #F8FAFC 0%, #EEF4FF 100%);
 }
 
 /* Subtle background glow (very light on white) */
@@ -74,21 +76,21 @@ body {
 .bg-orb-1 {
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(30,144,255,0.06) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%);
   top: -150px; right: 100px;
   animation: orbDrift 20s ease-in-out infinite;
 }
 .bg-orb-2 {
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(14,165,233,0.04) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(99,102,241,0.05) 0%, transparent 70%);
   bottom: 0; left: 300px;
   animation: orbDrift 28s ease-in-out infinite reverse;
 }
 .bg-orb-3 {
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(30,144,255,0.04) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(139,92,246,0.04) 0%, transparent 70%);
   top: 50%; right: 20%;
   animation: orbDrift 16s ease-in-out infinite;
 }
@@ -140,7 +142,7 @@ body {
   gap: 10px;
   padding: 10px 16px;
   margin: 12px 12px;
-  background: linear-gradient(135deg, #1E90FF 0%, #0EA5E9 100%);
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   border: none;
   border-radius: 12px;
   color: #ffffff;
@@ -148,12 +150,12 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 3px 12px rgba(30, 144, 255, 0.28);
+  box-shadow: 0 3px 12px rgba(59, 130, 246, 0.28);
   width: calc(100% - 24px);
   text-decoration: none;
 }
 .new-chat-btn:hover {
-  box-shadow: 0 5px 20px rgba(30, 144, 255, 0.42);
+  box-shadow: 0 5px 20px rgba(59, 130, 246, 0.42);
   transform: translateY(-1px);
 }
 
@@ -184,7 +186,7 @@ body {
 }
 .sidebar-chat-item:hover {
   background-color: #F0F4F9;
-  color: #0F172A;
+  color: #0B1B3B;
 }
 
 .sidebar-tool-item {
@@ -202,7 +204,7 @@ body {
 }
 .sidebar-tool-item:hover {
   background-color: #F0F4F9;
-  color: #0F172A;
+  color: #0B1B3B;
 }
 
 .sidebar-divider {
@@ -223,10 +225,10 @@ body {
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  background-color: rgba(30, 144, 255, 0.07);
-  border: 1px solid rgba(30, 144, 255, 0.22);
+  background-color: rgba(59, 130, 246, 0.07);
+  border: 1px solid rgba(59, 130, 246, 0.22);
   border-radius: 12px;
-  color: #1565C0;
+  color: #2563EB;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -236,8 +238,8 @@ body {
   margin-bottom: 8px;
 }
 .upgrade-btn:hover {
-  background-color: rgba(30, 144, 255, 0.12);
-  border-color: rgba(30, 144, 255, 0.38);
+  background-color: rgba(59, 130, 246, 0.12);
+  border-color: rgba(59, 130, 246, 0.38);
 }
 
 .user-info-row {
@@ -255,7 +257,7 @@ body {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1E90FF 0%, #0EA5E9 100%);
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -310,7 +312,7 @@ body {
 }
 .topbar-toggle:hover {
   background-color: #F0F4F9;
-  color: #0F172A;
+  color: #0B1B3B;
   border-color: #D0D9E8;
 }
 
@@ -347,7 +349,7 @@ body {
 
 .topbar-login-btn {
   padding: 7px 18px;
-  background: linear-gradient(135deg, #1E90FF 0%, #0EA5E9 100%);
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   border: none;
   border-radius: 99px;
   color: #ffffff;
@@ -358,10 +360,10 @@ body {
   text-decoration: none;
   display: flex;
   align-items: center;
-  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 .topbar-login-btn:hover {
-  box-shadow: 0 4px 16px rgba(30, 144, 255, 0.45);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.45);
   transform: translateY(-1px);
 }
 
@@ -401,7 +403,7 @@ body {
   min-width: 0;
   position: relative;
   z-index: 1;
-  background-color: #F4F6FA;
+  background-color: #F8FAFC;
   padding-top: var(--topbar-height); /* Add padding to account for fixed topbar */
 }
 
@@ -426,6 +428,8 @@ body {
   margin: 0 auto;
   text-align: center;
   padding: 60px 28px 40px;
+  position: relative;
+  overflow: hidden;
 }
 
 .welcome-logo-wrapper {
@@ -437,14 +441,14 @@ body {
   position: absolute;
   inset: -10px;
   border-radius: 50%;
-  border: 2px solid rgba(30, 144, 255, 0.3);
+  border: 3px solid rgba(59, 130, 246, 0.15);
   animation: logoRingPulse 3s ease-in-out infinite;
 }
 .welcome-logo-ring-2 {
   position: absolute;
   inset: -22px;
   border-radius: 50%;
-  border: 1px solid rgba(30, 144, 255, 0.14);
+  border: 1px solid rgba(59, 130, 246, 0.08);
   animation: logoRingPulse 3s ease-in-out infinite 0.6s;
 }
 .welcome-logo-img {
@@ -452,8 +456,23 @@ body {
   height: 80px;
   border-radius: 50%;
   object-fit: cover;
-  border: 3px solid rgba(30, 144, 255, 0.35);
-  box-shadow: 0 0 20px rgba(30, 144, 255, 0.18), 0 4px 16px rgba(15, 23, 42, 0.1);
+  background: white;
+  border: 3px solid rgba(59, 130, 246, 0.15);
+  box-shadow: 0 0 40px rgba(59, 130, 246, 0.25), 0 4px 16px rgba(15, 23, 42, 0.1);
+}
+
+/* Glassmorphism glow di belakang logo */
+.welcome-logo-glow {
+  position: absolute;
+  width: 240px;
+  height: 240px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(59,130,246,0.25), transparent 70%);
+  border-radius: 50%;
+  z-index: -1;
+  pointer-events: none;
 }
 
 @keyframes logoRingPulse {
@@ -461,27 +480,96 @@ body {
   50% { transform: scale(1.07); opacity: 1; }
 }
 
+/* Typography — Poppins ExtraBold */
 .welcome-greeting {
-  font-size: clamp(22px, 3vw, 32px);
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(36px, 5vw, 54px);
   font-weight: 800;
-  color: #0F172A;
+  color: #0B1B3B;
   letter-spacing: -0.025em;
-  line-height: 1.2;
+  line-height: 1.1;
   margin-bottom: 12px;
 }
-.welcome-greeting span {
-  background: linear-gradient(135deg, #1E90FF 0%, #0EA5E9 100%);
+.welcome-greeting .brand-name {
+  background: linear-gradient(90deg, #3B82F6, #2563EB, #6366F1, #8B5CF6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  white-space: nowrap;
+}
+
+/* Gradient underline di bawah brand name */
+.welcome-underline {
+  display: block;
+  width: 180px;
+  height: 6px;
+  background: linear-gradient(90deg, #3B82F6, #60A5FA);
+  border-radius: 50px;
+  margin: 8px auto 0;
 }
 
 .welcome-subtitle {
-  font-size: 15px;
-  color: #64748B;
+  font-family: 'Inter', sans-serif;
+  font-size: 22px;
+  font-weight: 400;
+  color: #6B7280;
   max-width: 460px;
   line-height: 1.7;
   margin-bottom: 36px;
+}
+
+/* Sparkle decorations */
+.sparkle {
+  position: absolute;
+  color: #60A5FA;
+  opacity: 0.6;
+  font-size: 14px;
+  animation: sparkleFloat 3s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+.sparkle:nth-child(1) { top: 15%; left: 15%; animation-delay: 0s; font-size: 12px; }
+.sparkle:nth-child(2) { top: 10%; right: 20%; animation-delay: 0.8s; font-size: 16px; }
+.sparkle:nth-child(3) { bottom: 30%; left: 10%; animation-delay: 1.4s; font-size: 10px; }
+.sparkle:nth-child(4) { bottom: 25%; right: 12%; animation-delay: 0.5s; font-size: 18px; }
+.sparkle:nth-child(5) { top: 35%; right: 8%; animation-delay: 1.8s; font-size: 11px; }
+
+@keyframes sparkleFloat {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
+  50% { transform: translateY(-8px) scale(1.3); opacity: 0.8; }
+}
+
+/* Floating shapes */
+.floating-shape {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.08);
+  opacity: 0.2;
+  filter: blur(2px);
+  pointer-events: none;
+  z-index: 0;
+}
+.floating-shape:nth-child(1) { width: 80px; height: 80px; top: 8%; left: 5%; animation: floatShape 12s ease-in-out infinite; }
+.floating-shape:nth-child(2) { width: 40px; height: 40px; top: 20%; right: 8%; animation: floatShape 16s ease-in-out infinite reverse; background: rgba(99,102,241,0.08); }
+.floating-shape:nth-child(3) { width: 60px; height: 60px; bottom: 15%; left: 12%; animation: floatShape 14s ease-in-out infinite 2s; background: rgba(139,92,246,0.06); }
+.floating-shape:nth-child(4) { width: 20px; height: 20px; bottom: 35%; right: 15%; animation: floatShape 10s ease-in-out infinite 1s; }
+
+@keyframes floatShape {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(10px, -15px); }
+  50% { transform: translate(-5px, 10px); }
+  75% { transform: translate(8px, -8px); }
+}
+
+/* Wave SVG di bagian bawah */
+.welcome-wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
 }
 
 .suggestions-grid {
@@ -506,9 +594,9 @@ body {
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
 }
 .suggestion-card:hover {
-  border-color: rgba(30, 144, 255, 0.35);
+  border-color: rgba(59, 130, 246, 0.35);
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(30, 144, 255, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.1), 0 2px 6px rgba(15, 23, 42, 0.06);
   background-color: #F8FBFF;
 }
 
@@ -516,7 +604,7 @@ body {
 .suggestion-title {
   font-size: 13px;
   font-weight: 700;
-  color: #0F172A;
+  color: #0B1B3B;
   line-height: 1.3;
 }
 .suggestion-desc {
@@ -535,7 +623,7 @@ body {
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
-  background-color: #F4F6FA;
+  background-color: #F8FAFC;
   position: relative;
   z-index: 5;
 }
@@ -545,7 +633,7 @@ body {
   bottom: 100%;
   left: 0; right: 0;
   height: 40px;
-  background: linear-gradient(to bottom, transparent, #F4F6FA);
+  background: linear-gradient(to bottom, transparent, #F8FAFC);
   pointer-events: none;
 }
 
@@ -563,8 +651,8 @@ body {
   box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
 }
 .chat-input-bar:focus-within {
-  border-color: #1E90FF;
-  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06), 0 0 0 3px rgba(30, 144, 255, 0.1);
+  border-color: #3B82F6;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06), 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .chat-textarea {
@@ -572,7 +660,7 @@ body {
   background: transparent;
   border: none;
   outline: none;
-  color: #0F172A;
+  color: #0B1B3B;
   font-size: 15px;
   font-family: inherit;
   line-height: 1.6;
@@ -605,9 +693,9 @@ body {
   flex-shrink: 0;
 }
 .input-icon-btn:hover {
-  color: #1E90FF;
-  border-color: rgba(30, 144, 255, 0.2);
-  background-color: rgba(30, 144, 255, 0.06);
+  color: #3B82F6;
+  border-color: rgba(59, 130, 246, 0.2);
+  background-color: rgba(59, 130, 246, 0.06);
 }
 
 .send-btn {
@@ -616,17 +704,17 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #1E90FF 0%, #0EA5E9 100%);
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   border: none;
   border-radius: 10px;
   cursor: pointer;
   color: #ffffff;
   transition: all 0.2s ease;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(30, 144, 255, 0.35);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
 }
 .send-btn:hover:not(:disabled) {
-  box-shadow: 0 4px 14px rgba(30, 144, 255, 0.5);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.5);
   transform: translateY(-1px);
 }
 .send-btn:disabled {
@@ -669,11 +757,11 @@ body {
 .message-user-bubble {
   max-width: 75%;
   background-color: #E8F3FF;
-  border: 1px solid rgba(30, 144, 255, 0.18);
+  border: 1px solid rgba(59, 130, 246, 0.18);
   border-radius: 18px 18px 4px 18px;
   padding: 12px 18px;
   font-size: 15px;
-  color: #0F172A;
+  color: #0B1B3B;
   line-height: 1.65;
 }
 
@@ -687,7 +775,7 @@ body {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #1E90FF 0%, #0EA5E9 100%);
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -696,13 +784,13 @@ body {
   color: #ffffff;
   flex-shrink: 0;
   margin-top: 2px;
-  box-shadow: 0 2px 6px rgba(30, 144, 255, 0.3);
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
 }
 .message-ai-content { flex: 1; min-width: 0; }
 .message-ai-name {
   font-size: 13px;
   font-weight: 600;
-  color: #1565C0;
+  color: #2563EB;
   margin-bottom: 6px;
   display: flex;
   align-items: center;
@@ -714,7 +802,7 @@ body {
   line-height: 1.75;
   white-space: pre-wrap;
 }
-.message-ai-text strong { color: #0F172A; font-weight: 600; }
+.message-ai-text strong { color: #0B1B3B; font-weight: 600; }
 
 .legal-sources {
   display: flex;
@@ -729,18 +817,18 @@ body {
   align-items: center;
   gap: 5px;
   padding: 5px 11px;
-  background-color: rgba(30, 144, 255, 0.07);
-  border: 1px solid rgba(30, 144, 255, 0.2);
+  background-color: rgba(59, 130, 246, 0.07);
+  border: 1px solid rgba(59, 130, 246, 0.2);
   border-radius: 99px;
   font-size: 12px;
-  color: #1565C0;
+  color: #2563EB;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
 }
 .legal-source-chip:hover {
-  background-color: rgba(30, 144, 255, 0.13);
-  border-color: rgba(30, 144, 255, 0.38);
+  background-color: rgba(59, 130, 246, 0.13);
+  border-color: rgba(59, 130, 246, 0.38);
 }
 
 .message-actions {
@@ -792,7 +880,7 @@ body {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #1E90FF;
+  background-color: #3B82F6;
   animation: typingBounce 1.3s ease infinite;
 }
 .typing-dot:nth-child(2) { animation-delay: 0.2s; }
@@ -821,7 +909,7 @@ body {
 .animate-fade-up-3 { animation: fadeInUp 0.45s ease 0.24s both; }
 
 .gradient-text {
-  background: linear-gradient(135deg, #1E90FF 0%, #0EA5E9 100%);
+  background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
