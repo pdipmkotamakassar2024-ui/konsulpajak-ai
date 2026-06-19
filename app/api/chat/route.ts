@@ -73,18 +73,21 @@ export async function POST(req: Request) {
   // Sanitize & konversi messages ke format model
   const sanitizedMessages = rawMessages.map((msg: any) => {
     if (msg.role === 'user') {
-      // Ekstrak teks dari parts jika ada
+      // SDK v6 sendMessage({ text }) mengirim content: "" (kosong) dan parts: [{type:'text', text:'...'}]
+      // Jadi kita HARUS cek parts[] terlebih dahulu, baru fallback ke content string
       let textContent = '';
-      if (typeof msg.content === 'string') {
-        textContent = msg.content;
-      } else if (Array.isArray(msg.parts)) {
+      if (Array.isArray(msg.parts) && msg.parts.length > 0) {
         textContent = msg.parts
           .filter((p: any) => p.type === 'text')
           .map((p: any) => p.text || '')
           .join('');
       }
+      // Fallback ke content jika parts kosong atau tidak ada teks
+      if (!textContent && msg.content && typeof msg.content === 'string') {
+        textContent = msg.content;
+      }
       return {
-        role: 'user',
+        role: 'user' as const,
         content: textContent,
         parts: [{ type: 'text', text: textContent }],
       };
