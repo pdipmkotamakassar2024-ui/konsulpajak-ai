@@ -60,32 +60,46 @@ export async function POST(req: Request) {
   }
 
   let userMsgCount = 0;
+  let hasActiveSubscription = false;
   let user = null;
   try {
     const supabase = await createClient();
     const { data } = await supabase.auth.getUser();
     user = data.user;
 
-    // LIMIT: user login 25/hari, tamu sudah dicek di client
-    if (user) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const { count } = await supabase
-        .from('messages')
-        .select('id', { count: 'exact', head: true })
-        .eq('role', 'user')
-        .gte('created_at', today.toISOString());
-      
-      userMsgCount = count || 0;
+    if (user && user.email) {
+      // Cek apakah user memiliki paket aktif
+      const { data: sub } = await supabase
+        .from('subscriptions')
+        .select('expires_at')
+        .eq('email', user.email)
+        .maybeSingle();
+
+      if (sub && new Date(sub.expires_at) > new Date()) {
+        hasActiveSubscription = true;
+      }
+
+      // LIMIT: 5/hari untuk user tanpa langganan
+      if (!hasActiveSubscription) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const { count } = await supabase
+          .from('messages')
+          .select('id', { count: 'exact', head: true })
+          .eq('role', 'user')
+          .gte('created_at', today.toISOString());
+        
+        userMsgCount = count || 0;
+      }
     }
   } catch (err: any) {
     console.error('[route] Supabase error:', err?.message);
-    // Continue without user if supabase fails (e.g., missing env vars)
+    // Continue without user if supabase fails
   }
 
-  if (userMsgCount >= 25) {
+  if (user && !hasActiveSubscription && userMsgCount >= 5) {
     return makeTextResponse(
-      '**LIMIT HARIAN TERCAPAI**\n\nMaaf, Anda telah mencapai batas 25 pertanyaan untuk hari ini. Silakan kembali besok atau upgrade paket Anda di /harga.'
+      '**LIMIT HARIAN TERCAPAI**\n\nMaaf, Anda telah mencapai batas 5 pertanyaan gratis untuk hari ini. Silakan kembali besok atau upgrade Paket Pro Anda di menu Harga.'
     );
   }
 
