@@ -203,11 +203,14 @@ export default function ChatInterface({ user }: { user: User | null }) {
 
     // Kirim ke AI SDK
     if (chat.append) {
-      chat.append({
+      const msgPayload: any = {
         role: 'user',
-        content: content || "Tolong analisis dokumen/gambar ini.",
-        experimental_attachments: files
-      });
+        content: content || "Tolong analisis dokumen/gambar ini."
+      };
+      if (files && files.length > 0) {
+        msgPayload.experimental_attachments = files;
+      }
+      chat.append(msgPayload);
     } else {
       console.error("No append function found in useChat.");
     }

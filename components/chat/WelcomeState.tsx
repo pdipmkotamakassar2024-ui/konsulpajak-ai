@@ -42,10 +42,10 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
         flex: 1,
         display: "flex",
         flexDirection: "column",
-        justifyContent: "flex-start",
+        justifyContent: "center",
         alignItems: "center",
-        minHeight: "60vh",
-        paddingTop: "20px",
+        minHeight: "70vh",
+        paddingTop: 0,
         position: "relative",
         overflow: "hidden",
       }}
@@ -231,7 +231,7 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
           marginTop: "0px",
           marginBottom: "0px",
           fontFamily: "'Poppins', sans-serif",
-          fontSize: "clamp(22px, 2.5vw, 36px)",
+          fontSize: "clamp(26px, 3.5vw, 42px)",
           fontWeight: 800,
           lineHeight: 1.2,
         }}
