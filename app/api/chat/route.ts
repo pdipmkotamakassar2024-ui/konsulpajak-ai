@@ -59,25 +59,35 @@ export async function POST(req: Request) {
     console.log('[route] last message parts:', JSON.stringify(last.parts).slice(0, 200));
   }
 
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  let userMsgCount = 0;
+  let user = null;
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.auth.getUser();
+    user = data.user;
 
-  // ─── LIMIT: user login 25/hari, tamu sudah dicek di client ───────────────
-  if (user) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const { count: userMsgCount } = await supabase
-      .from('messages')
-      .select('id', { count: 'exact', head: true })
-      .eq('role', 'user')
-      .gte('created_at', today.toISOString());
-    if (userMsgCount !== null && userMsgCount >= 25) {
-      return makeTextResponse(
-        '**LIMIT HARIAN TERCAPAI**\n\nMaaf, Anda telah mencapai batas 25 pertanyaan untuk hari ini. Silakan kembali besok atau upgrade paket Anda di /harga.'
-      );
+    // LIMIT: user login 25/hari, tamu sudah dicek di client
+    if (user) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const { count } = await supabase
+        .from('messages')
+        .select('id', { count: 'exact', head: true })
+        .eq('role', 'user')
+        .gte('created_at', today.toISOString());
+      
+      userMsgCount = count || 0;
     }
+  } catch (err: any) {
+    console.error('[route] Supabase error:', err?.message);
+    // Continue without user if supabase fails (e.g., missing env vars)
   }
-  // ─────────────────────────────────────────────────────────────────────────
+
+  if (userMsgCount >= 25) {
+    return makeTextResponse(
+      '**LIMIT HARIAN TERCAPAI**\n\nMaaf, Anda telah mencapai batas 25 pertanyaan untuk hari ini. Silakan kembali besok atau upgrade paket Anda di /harga.'
+    );
+  }
 
   // Cek API key
   const apiKey = (process.env.GOOGLE_GENERATIVE_AI_API_KEY || '').trim();
@@ -121,7 +131,7 @@ export async function POST(req: Request) {
   let result: any;
   try {
     result = streamText({
-      model: google('gemini-2.5-flash'),
+      model: google('gemini-1.5-flash'),
       system: `Anda adalah **KonsulPajak AI** — konsultan pajak cerdas berbasis AI untuk UMKM, karyawan, profesional, dan entitas bisnis di Indonesia. Anda WAJIB sepenuhnya berorientasi pada regulasi terbaru dan sistem **Coretax DJP**. 
 
 ## IDENTITAS & GAYA BAHASA
