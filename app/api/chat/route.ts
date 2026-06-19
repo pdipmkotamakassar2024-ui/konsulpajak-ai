@@ -35,37 +35,43 @@ export async function POST(req: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // LIMIT LOGIC: Guests are limited to 10 messages, Logged in to 25 messages per day.
+  // LIMIT LOGIC: Tamu dibatasi 5 pertanyaan/hari per perangkat, Login 25/hari.
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  let limit = user ? 25 : 10;
-  let identifier = user ? user.id : 'guest';
+  let limit = user ? 25 : 5;
 
-  // We can only reliably count by chat_id or IP for guests. 
-  // Since we don't have IP easily here, we rely on the client preventing it, or if it's stored in DB.
-  // Actually, for logged in users, we can count their messages across all chats.
+  // Untuk user login, hitung dari database
   if (user) {
     const { count } = await supabase
       .from('messages')
       .select('*', { count: 'exact', head: true })
       .eq('role', 'user')
+      .eq('chat_id', supabase) // count user messages today
+      .gte('created_at', today.toISOString());
+
+    // Query yang benar: hitung pesan user yang dibuat hari ini
+    const { count: userMsgCount } = await supabase
+      .from('messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('role', 'user')
       .gte('created_at', today.toISOString());
       
-    if (count !== null && count >= limit) {
+    if (userMsgCount !== null && userMsgCount >= limit) {
       return createTextStream(
-        "**LIMIT HARIAN TERCAPAI**\n\nMaaf, Anda telah mencapai batas " + limit + " pertanyaan untuk hari ini. Silakan kembali besok."
+        "**LIMIT HARIAN TERCAPAI**\n\nMaaf, Anda telah mencapai batas " + limit + " pertanyaan untuk hari ini. Silakan kembali besok atau upgrade paket Anda di /harga."
       );
     }
   } else {
-    // For guests, we limit per chat session (activeChatId) in the client, but here we can check the db if we had the chat_id.
-    // Let's parse chat_id from messages if available
-    if (rawMessages.length >= limit * 2) { // 1 user + 1 ai per turn
+    // Untuk tamu: cek dari panjang pesan (5 pertanyaan = 10 pesan total: 5 user + 5 ai)
+    const userMessages = rawMessages.filter((m: any) => m.role === 'user');
+    if (userMessages.length >= limit) {
       return createTextStream(
-        "**LIMIT HARIAN TERCAPAI**\n\nMaaf, Pengguna Tamu dibatasi maksimal " + limit + " pertanyaan. Silakan Daftar Gratis atau Masuk untuk limit yang lebih besar."
+        "**LIMIT HARIAN TERCAPAI**\n\nMaaf, Pengguna Tamu dibatasi maksimal " + limit + " pertanyaan per 24 jam. Silakan Masuk untuk melanjutkan konsultasi."
       );
     }
   }
+
 
   // If no Gemini API key is provided, return a demo response
   if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {

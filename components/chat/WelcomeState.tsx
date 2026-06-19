@@ -2,14 +2,8 @@
 
 import Image from "next/image";
 
-// Daftar saran prompt — tetap sama seperti sebelumnya
+// Daftar saran prompt — PPh 21 Karyawan dihapus per permintaan
 export const suggestions = [
-  {
-    icon: "💼",
-    title: "PPh 21 Karyawan",
-    desc: "Berapa pajak saya jika gaji Rp 8 juta per bulan?",
-    prompt: "Berapa pajak PPh 21 saya jika gaji pokok Rp 8 juta per bulan dengan status TK/0?",
-  },
   {
     icon: "🛒",
     title: "Pajak Jualan Online",
@@ -48,10 +42,10 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
         flex: 1,
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
+        justifyContent: "flex-start",
         alignItems: "center",
-        minHeight: "70vh",
-        paddingTop: 0,
+        minHeight: "60vh",
+        paddingTop: "20px",
         position: "relative",
         overflow: "hidden",
       }}
@@ -122,7 +116,7 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
       <div
         className="welcome-logo-wrapper animate-fade-up"
         style={{
-          marginBottom: "32px",
+          marginBottom: "16px",
           position: "relative",
           display: "flex",
           justifyContent: "center",
@@ -220,7 +214,7 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
           textAlign: "center",
           marginBottom: "4px",
           fontFamily: "'Poppins', sans-serif",
-          fontSize: "clamp(36px, 5vw, 54px)",
+          fontSize: "clamp(20px, 2vw, 28px)",
           fontWeight: 800,
           color: "#0B1B3B",
           lineHeight: 1.2,
@@ -237,7 +231,7 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
           marginTop: "0px",
           marginBottom: "0px",
           fontFamily: "'Poppins', sans-serif",
-          fontSize: "clamp(36px, 5vw, 54px)",
+          fontSize: "clamp(22px, 2.5vw, 36px)",
           fontWeight: 800,
           lineHeight: 1.2,
         }}
@@ -272,9 +266,9 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
       <p
         className="animate-fade-up-2"
         style={{
-          marginBottom: "40px",
+          marginBottom: "24px",
           fontFamily: "'Inter', sans-serif",
-          fontSize: "22px",
+          fontSize: "15px",
           fontWeight: 400,
           color: "#6B7280",
           textAlign: "center",

@@ -12,13 +12,77 @@ import ChatInputBar from "./ChatInputBar";
 import { User } from "@supabase/supabase-js";
 import { createClient } from "@/utils/supabase/client";
 
+// ─── Guest rate-limit helpers (5 pertanyaan per 24 jam per perangkat) ─────────
+const GUEST_LIMIT = 5;
+const GUEST_KEY = "guestRateLimit";
+
+interface GuestRateData {
+  count: number;
+  resetAt: number; // timestamp ms
+}
+
+function getGuestData(): GuestRateData {
+  try {
+    const raw = localStorage.getItem(GUEST_KEY);
+    if (!raw) return { count: 0, resetAt: Date.now() + 24 * 60 * 60 * 1000 };
+    const parsed: GuestRateData = JSON.parse(raw);
+    // Reset jika sudah lewat 24 jam
+    if (Date.now() > parsed.resetAt) {
+      const fresh = { count: 0, resetAt: Date.now() + 24 * 60 * 60 * 1000 };
+      localStorage.setItem(GUEST_KEY, JSON.stringify(fresh));
+      return fresh;
+    }
+    return parsed;
+  } catch {
+    return { count: 0, resetAt: Date.now() + 24 * 60 * 60 * 1000 };
+  }
+}
+
+function incrementGuestCount(): number {
+  const data = getGuestData();
+  const updated = { ...data, count: data.count + 1 };
+  localStorage.setItem(GUEST_KEY, JSON.stringify(updated));
+  return updated.count;
+}
+
+function getRemainingGuest(): number {
+  const data = getGuestData();
+  return Math.max(0, GUEST_LIMIT - data.count);
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 export default function ChatInterface({ user }: { user: User | null }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const activeChatIdRef = useRef<string | null>(null);
-  
+  const [darkMode, setDarkMode] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
+
+  // ─── Dark mode: apply to <html> element ───────────────────────────────────
+  useEffect(() => {
+    // Load saved preference
+    const saved = localStorage.getItem("darkMode");
+    if (saved === "true") {
+      setDarkMode(true);
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    setDarkMode((prev) => {
+      const next = !prev;
+      localStorage.setItem("darkMode", String(next));
+      if (next) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+      return next;
+    });
+  };
+  // ─────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     activeChatIdRef.current = activeChatId;
@@ -27,7 +91,7 @@ export default function ChatInterface({ user }: { user: User | null }) {
   const chat = useChat({
     transport: new TextStreamChatTransport({ api: '/api/chat' }),
     onFinish: async (event) => {
-      // Save AI message to DB when finished
+      // Simpan pesan AI ke DB setelah selesai streaming
       const chatId = activeChatIdRef.current;
       if (chatId && user && event.message) {
         const msg = event.message;
@@ -43,19 +107,18 @@ export default function ChatInterface({ user }: { user: User | null }) {
       }
     }
   });
-  
+
   const messages = chat.messages || [];
   const status = chat.status || "ready";
   const isLoading = status === "submitted" || status === "streaming";
   const setMessages = chat.setMessages;
-  const sendMessage = chat.sendMessage;
 
-  // Auto-scroll on new messages
+  // Auto-scroll ke pesan terbaru
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  // Close sidebar on small screens by default
+  // Tutup sidebar di layar kecil secara default
   useEffect(() => {
     if (window.innerWidth < 768) {
       setSidebarOpen(false);
@@ -70,19 +133,17 @@ export default function ChatInterface({ user }: { user: User | null }) {
   const loadChat = async (id: string) => {
     if (!user) return;
     setActiveChatId(id);
-    setMessages([]); // clear current
+    setMessages([]);
     const { data } = await supabase.from('messages')
       .select('*')
       .eq('chat_id', id)
       .order('created_at', { ascending: true });
-      
+
     if (data) {
-      // Convert db messages to UI messages format
       const uiMessages = data.map(msg => ({
         id: msg.id,
         role: msg.role,
         content: msg.content,
-        // Include parts to satisfy SDK v6 if needed
         parts: [{ type: 'text', text: msg.content }]
       }));
       // @ts-ignore
@@ -93,27 +154,37 @@ export default function ChatInterface({ user }: { user: User | null }) {
 
   const handleSend = async (content: string, files?: File[]) => {
     if ((!content.trim() && (!files || files.length === 0)) || isLoading) return;
-    
-    let currentChatId = activeChatId;
-    
-    // GUEST LIMIT CHECK (Max 10 questions)
+
+    // ─── GUEST RATE LIMIT: 5 pertanyaan per 24 jam per perangkat ─────────
     if (!user) {
-      const guestMsgCount = parseInt(localStorage.getItem('guestMsgCount') || '0');
-      if (guestMsgCount >= 10) {
-         window.alert("Batas akses gratis untuk pengguna tamu telah habis (Maks. 10 kali). Silakan login atau daftar secara gratis untuk melanjutkan konsultasi.");
-         return;
+      const data = getGuestData();
+      if (data.count >= GUEST_LIMIT) {
+        const resetDate = new Date(data.resetAt);
+        const resetStr = resetDate.toLocaleString("id-ID", {
+          hour: "2-digit", minute: "2-digit", day: "numeric", month: "long"
+        });
+        window.alert(
+          `Batas pertanyaan harian habis!\n\n` +
+          `Pengguna tamu dibatasi ${GUEST_LIMIT} pertanyaan per 24 jam.\n` +
+          `Limit akan reset pada: ${resetStr}\n\n` +
+          `Silakan Masuk/Login untuk melanjutkan konsultasi.`
+        );
+        return;
       }
-      localStorage.setItem('guestMsgCount', (guestMsgCount + 1).toString());
+      incrementGuestCount();
     }
-    
-    // Create new chat if this is the first message
+    // ─────────────────────────────────────────────────────────────────────
+
+    let currentChatId = activeChatId;
+
+    // Buat chat baru jika ini pesan pertama (user login)
     if (!currentChatId && user) {
       const title = content ? content.substring(0, 50) + (content.length > 50 ? "..." : "") : "Konsultasi Gambar";
       const { data } = await supabase.from('chats').insert({
         user_id: user.id,
         title: title
       }).select().single();
-      
+
       if (data) {
         currentChatId = data.id;
         setActiveChatId(data.id);
@@ -121,7 +192,7 @@ export default function ChatInterface({ user }: { user: User | null }) {
       }
     }
 
-    // Save user message to database (without the image data for now to save space, or just text)
+    // Simpan pesan user ke database
     if (currentChatId && user && content) {
       await supabase.from('messages').insert({
         chat_id: currentChatId,
@@ -130,9 +201,9 @@ export default function ChatInterface({ user }: { user: User | null }) {
       });
     }
 
-    // Send to AI SDK using append
+    // Kirim ke AI SDK
     if (chat.append) {
-      chat.append({ 
+      chat.append({
         role: 'user',
         content: content || "Tolong analisis dokumen/gambar ini.",
         experimental_attachments: files
@@ -166,6 +237,8 @@ export default function ChatInterface({ user }: { user: User | null }) {
           onToggleSidebar={() => setSidebarOpen((v) => !v)}
           sidebarOpen={sidebarOpen}
           user={user}
+          darkMode={darkMode}
+          onToggleDarkMode={toggleDarkMode}
         />
 
         {/* Scrollable chat area */}
@@ -178,7 +251,7 @@ export default function ChatInterface({ user }: { user: User | null }) {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input bar — always visible */}
+        {/* Input bar — selalu tampil */}
         <ChatInputBar onSend={handleSend} isLoading={isLoading} />
       </div>
     </div>
