@@ -1,20 +1,17 @@
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
-import { streamText, convertToModelMessages, createTextStreamResponse } from 'ai';
+import { streamText } from 'ai';
 import { createClient } from '@/utils/supabase/server';
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
-/**
- * Helper: buat text stream response untuk pesan error/limit.
- * TextStreamChatTransport mengharapkan Content-Type: text/plain.
- */
+// ─── Helper: buat text/plain streaming response ───────────────────────────────
 function makeTextResponse(text: string): Response {
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
       const words = text.split(' ');
       for (let i = 0; i < words.length; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 20));
+        await new Promise((r) => setTimeout(r, 15));
         controller.enqueue(encoder.encode(words[i] + (i < words.length - 1 ? ' ' : '')));
       }
       controller.close();
@@ -25,149 +22,179 @@ function makeTextResponse(text: string): Response {
   });
 }
 
-export async function POST(req: Request) {
-  const body = await req.json();
+// ─── Helper: ekstrak teks dari UIMessage SDK v6 ────────────────────────────────
+function extractText(msg: any): string {
+  // SDK v6 sendMessage({ text }) → content: "", parts: [{type:'text', text:'...'}]
+  // Cek parts terlebih dahulu
+  if (Array.isArray(msg.parts)) {
+    const fromParts = msg.parts
+      .filter((p: any) => p.type === 'text')
+      .map((p: any) => String(p.text || ''))
+      .join('');
+    if (fromParts.trim()) return fromParts.trim();
+  }
+  // Fallback ke content string
+  if (typeof msg.content === 'string' && msg.content.trim()) {
+    return msg.content.trim();
+  }
+  return '';
+}
 
-  // SDK v6 / TextStreamChatTransport mengirim body dengan format:
-  // { messages: UIMessage[], id: string, trigger: 'submit-message' }
-  const rawMessages = body.messages || [];
+export async function POST(req: Request) {
+  let body: any;
+  try {
+    body = await req.json();
+  } catch {
+    return makeTextResponse('⚠️ Request tidak valid.');
+  }
+
+  const rawMessages: any[] = body.messages || [];
+  
+  // Debug: log format pesan yang masuk
+  console.log('[route] messages count:', rawMessages.length);
+  if (rawMessages.length > 0) {
+    const last = rawMessages[rawMessages.length - 1];
+    console.log('[route] last message role:', last.role);
+    console.log('[route] last message content:', JSON.stringify(last.content).slice(0, 100));
+    console.log('[route] last message parts:', JSON.stringify(last.parts).slice(0, 200));
+  }
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // ─── LIMIT: Tamu 5/hari (cek client-side), Login 25/hari (cek server) ────
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
+  // ─── LIMIT: user login 25/hari, tamu sudah dicek di client ───────────────
   if (user) {
-    // Hitung pesan user hari ini dari semua chat milik user ini
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     const { count: userMsgCount } = await supabase
       .from('messages')
       .select('id', { count: 'exact', head: true })
       .eq('role', 'user')
       .gte('created_at', today.toISOString());
-
     if (userMsgCount !== null && userMsgCount >= 25) {
       return makeTextResponse(
         '**LIMIT HARIAN TERCAPAI**\n\nMaaf, Anda telah mencapai batas 25 pertanyaan untuk hari ini. Silakan kembali besok atau upgrade paket Anda di /harga.'
       );
     }
-  } else {
-    // Untuk tamu: cek jumlah pesan user dalam session ini
-    const userMessages = rawMessages.filter((m: any) => m.role === 'user');
-    if (userMessages.length > 5) {
-      return makeTextResponse(
-        '**LIMIT HARIAN TERCAPAI**\n\nMaaf, Pengguna Tamu dibatasi maksimal 5 pertanyaan per 24 jam. Silakan Masuk untuk melanjutkan konsultasi.'
-      );
-    }
   }
   // ─────────────────────────────────────────────────────────────────────────
 
-  // Jika tidak ada API key, kembalikan respons demo
-  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+  // Cek API key
+  const apiKey = (process.env.GOOGLE_GENERATIVE_AI_API_KEY || '').trim();
+  if (!apiKey) {
     return makeTextResponse(
-      'Halo! Saya adalah KonsulPajak AI.\n\nSistem saat ini berjalan dalam mode **Offline/Demo** karena API Key belum dikonfigurasi. Silakan hubungi admin untuk mengaktifkan layanan AI.'
+      'Halo! Saya KonsulPajak AI.\n\nSistem berjalan dalam mode **Demo** karena API Key belum dikonfigurasi. Hubungi admin untuk mengaktifkan layanan AI.'
     );
   }
 
-  // Sanitize & konversi messages ke format model
-  const sanitizedMessages = rawMessages.map((msg: any) => {
-    if (msg.role === 'user') {
-      // SDK v6 sendMessage({ text }) mengirim content: "" (kosong) dan parts: [{type:'text', text:'...'}]
-      // Jadi kita HARUS cek parts[] terlebih dahulu, baru fallback ke content string
-      let textContent = '';
-      if (Array.isArray(msg.parts) && msg.parts.length > 0) {
-        textContent = msg.parts
-          .filter((p: any) => p.type === 'text')
-          .map((p: any) => p.text || '')
-          .join('');
-      }
-      // Fallback ke content jika parts kosong atau tidak ada teks
-      if (!textContent && msg.content && typeof msg.content === 'string') {
-        textContent = msg.content;
-      }
-      return {
-        role: 'user' as const,
-        content: textContent,
-        parts: [{ type: 'text', text: textContent }],
-      };
-    }
-    return msg;
-  });
+  // ─── Konversi UIMessage[] → CoreMessage[] sederhana ──────────────────────
+  // Hindari convertToModelMessages yang berpotensi error dengan format baru SDK v6
+  type CoreMsg = { role: 'user' | 'assistant'; content: string };
+  const coreMessages: CoreMsg[] = [];
 
-  // Konversi ke format model Gemini
-  let modelMessages: any;
-  try {
-    modelMessages = convertToModelMessages(sanitizedMessages);
-  } catch {
-    modelMessages = sanitizedMessages;
+  for (const msg of rawMessages) {
+    if (msg.role === 'user') {
+      const text = extractText(msg);
+      console.log('[route] user text extracted:', text.slice(0, 100));
+      if (text) {
+        coreMessages.push({ role: 'user', content: text });
+      }
+    } else if (msg.role === 'assistant') {
+      const text = extractText(msg);
+      if (text) {
+        coreMessages.push({ role: 'assistant', content: text });
+      }
+    }
   }
 
-  // Init Gemini provider
-  const customGoogle = createGoogleGenerativeAI({
-    apiKey: (process.env.GOOGLE_GENERATIVE_AI_API_KEY || '').trim(),
-  });
+  // Jika tidak ada pesan user sama sekali, tolak
+  if (coreMessages.length === 0 || !coreMessages.some(m => m.role === 'user')) {
+    console.error('[route] No valid user message found. rawMessages:', JSON.stringify(rawMessages).slice(0, 500));
+    return makeTextResponse('⚠️ Pesan tidak diterima dengan benar. Silakan coba lagi.');
+  }
 
-  const result = streamText({
-    model: customGoogle('gemini-2.5-flash'),
-    system: `Anda adalah **KonsulPajak AI** — konsultan pajak cerdas berbasis AI untuk UMKM, karyawan, profesional, dan entitas bisnis di Indonesia. Anda WAJIB sepenuhnya berorientasi pada regulasi terbaru dan sistem **Coretax DJP**. 
+  console.log('[route] coreMessages count:', coreMessages.length);
+
+  // ─── Panggil Gemini ───────────────────────────────────────────────────────
+  const google = createGoogleGenerativeAI({ apiKey });
+
+  let result: any;
+  try {
+    result = streamText({
+      model: google('gemini-2.5-flash'),
+      system: `Anda adalah **KonsulPajak AI** — konsultan pajak cerdas berbasis AI untuk UMKM, karyawan, profesional, dan entitas bisnis di Indonesia. Anda WAJIB sepenuhnya berorientasi pada regulasi terbaru dan sistem **Coretax DJP**. 
 
 ## IDENTITAS & GAYA BAHASA
-- **SANGAT Singkat & Padat**: Jawab layaknya AI Gemini—berikan jawaban yang paling inti dan praktis (to-the-point).
-- **TIDAK PERLU Menjelaskan Undang-Undang**: JANGAN menjelaskan isi pasal atau undang-undang secara panjang lebar. Cukup lampirkan nama peraturannya sebagai referensi di akhir jawaban.
+- **Singkat & Padat**: Berikan jawaban yang paling inti dan praktis (to-the-point).
+- **TIDAK PERLU Menjelaskan Undang-Undang secara detail**: Cukup lampirkan nama peraturannya sebagai referensi di akhir jawaban.
 - **Kasual & Profesional**: Bahasa Indonesia baku tapi santai.
-- **Hindari Blank Answer**: Jika ada pertanyaan abu-abu seperti "bayar pajak influencer" atau "cara e-billing", asumsikan konteks pajak Indonesia dan pandu pengguna dengan ringkas, JANGAN menolak menjawab.
+- **Hindari Blank Answer**: Jika pertanyaan abu-abu tentang pajak, asumsikan konteks pajak Indonesia dan pandu pengguna.
 
-## RUANG LINGKUP — SISTEM CORETAX & PAJAK INDONESIA
-Fokus HANYA pada konteks Indonesia, meliputi:
+## RUANG LINGKUP — PAJAK INDONESIA & CORETAX
 - PPh 21, 22, 23, 25/29, 26, dan Final (termasuk UMKM 0.5%)
 - PPN 11% & e-Faktur
 - SPT Tahunan & Masa, e-Filing, SP2DK
-- **Sistem Coretax & Tahun 2025/2026**: WAJIB merujuk pada regulasi dan prosedur terbaru tahun pajak 2025/2026.
+- Sistem Coretax 2025/2026: Merujuk pada regulasi dan prosedur terbaru
 
-## FORMAT OUTPUT KHUSUS (COLORED OUTPUT)
-Jika pengguna meminta simulasi perhitungan, template surat (SP2DK), atau kesimpulan spesifik yang butuh penekanan visual, gunakan format blockquote peringatan berikut:
-- Untuk Hasil Kalkulasi / Kesimpulan Penting: Awali dengan \`> [!NOTE]\`
-- Untuk Peringatan Jatuh Tempo / Denda: Awali dengan \`> [!WARNING]\`
-- Untuk Dokumen / Template: Awali dengan \`> [!IMPORTANT]\`
+## FORMAT OUTPUT
+Untuk kalkulasi/kesimpulan penting: awali dengan \`> [!NOTE]\`
+Untuk peringatan jatuh tempo/denda: awali dengan \`> [!WARNING]\`
+Untuk template dokumen: awali dengan \`> [!IMPORTANT]\`
 
-## PENOLAKAN TOPIK DI LUAR PAJAK
-Jika ditanya hal di luar pajak (resep masakan, koding), jawab sopan: "Maaf, saya hanya dilatih khusus untuk urusan perpajakan dan Coretax Indonesia."
+## PENOLAKAN
+Jika ditanya hal di luar pajak, jawab: "Maaf, saya hanya dilatih untuk urusan perpajakan Indonesia."`,
+      messages: coreMessages,
+    });
+  } catch (initError: any) {
+    console.error('[route] streamText init error:', initError?.message || initError);
+    return makeTextResponse(`⚠️ Gagal menginisialisasi AI: ${initError?.message || 'Unknown error'}`);
+  }
 
-Jika pengguna melampirkan gambar/faktur, analisis dokumen tersebut secara langsung dan berikan ringkasan angka pajaknya.`,
-    messages: modelMessages,
-  });
-
-  // Kembalikan sebagai text stream (sesuai TextStreamChatTransport)
+  // ─── Stream respons ke client ─────────────────────────────────────────────
   const encoder = new TextEncoder();
   const textStream = new ReadableStream({
     async start(controller) {
       let hasContent = false;
       try {
         for await (const chunk of result.textStream) {
-          hasContent = true;
-          controller.enqueue(encoder.encode(chunk));
+          if (chunk) {
+            hasContent = true;
+            controller.enqueue(encoder.encode(chunk));
+          }
         }
-      } catch (error: any) {
+      } catch (streamError: any) {
         hasContent = true;
-        console.error('Stream error:', error);
-        const raw = String(error?.responseBody || error?.message || error || '');
-        let errorMsg = '⚠️ Terjadi kesalahan saat menghubungi AI.';
-        if (raw.includes('leaked') || raw.includes('PERMISSION_DENIED')) {
-          errorMsg = '⚠️ **API Key Bermasalah** — API Key Gemini telah dinonaktifkan. Hubungi admin.';
-        } else if (raw.includes('quota') || raw.includes('RESOURCE_EXHAUSTED')) {
+        console.error('[route] stream error:', streamError?.message || streamError);
+        const raw = String(streamError?.responseBody || streamError?.message || streamError || '');
+        let errorMsg = '⚠️ Terjadi kesalahan saat memproses respons AI.';
+        if (raw.includes('PERMISSION_DENIED') || raw.includes('leaked') || raw.includes('API key not valid')) {
+          errorMsg = '⚠️ **API Key Bermasalah** — Kunci API Gemini tidak valid atau telah dinonaktifkan. Hubungi admin.';
+        } else if (raw.includes('RESOURCE_EXHAUSTED') || raw.includes('quota')) {
           errorMsg = '⚠️ **Kuota Habis** — Kuota API Gemini telah terpakai. Coba lagi nanti.';
-        } else if (raw.includes('API key not valid')) {
-          errorMsg = '⚠️ **API Key Tidak Valid** — Kunci API yang dimasukkan salah.';
+        } else if (raw.includes('INVALID_ARGUMENT')) {
+          errorMsg = `⚠️ **Format Pesan Salah** — ${raw.slice(0, 200)}`;
         } else {
-          errorMsg = `⚠️ **Kesalahan:** ${error?.message || 'Gagal menghubungi layanan AI.'}`;
+          errorMsg = `⚠️ Error: ${streamError?.message || raw.slice(0, 200)}`;
         }
         controller.enqueue(encoder.encode(errorMsg));
       }
 
       if (!hasContent) {
+        // Coba ambil error dari response
+        let detail = '';
+        try {
+          const resp = await Promise.race([
+            result.response,
+            new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+          ]) as any;
+          console.error('[route] empty response:', JSON.stringify(resp).slice(0, 500));
+          detail = JSON.stringify(resp).slice(0, 300);
+        } catch (e: any) {
+          detail = e?.message || '';
+        }
+        console.error('[route] No content in stream. Detail:', detail);
         controller.enqueue(encoder.encode(
-          '⚠️ **Gagal mendapatkan respons dari AI.**\n\nPermintaan Anda mungkin diblokir oleh filter keamanan Gemini atau respons kosong.'
+          `⚠️ **Respons AI kosong.**\n\nKemungkinan penyebab: filter keamanan Gemini, format pesan tidak valid, atau kuota habis.\n\nDetail: ${detail || 'Tidak ada detail tersedia.'}`
         ));
       }
 
