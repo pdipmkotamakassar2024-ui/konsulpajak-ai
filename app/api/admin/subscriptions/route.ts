@@ -1,17 +1,17 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/utils/supabase/server';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const ADMIN_EMAILS = ['pdipmkotamakassar2024@gmail.com', 'ziqranraihan@gmail.com'];
 
 export async function POST(req: Request) {
   try {
-    const { email, plan_type, admin_password } = await req.json();
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    const correctPassword = process.env.ADMIN_PASSWORD;
-    if (!correctPassword || admin_password !== correctPassword) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+    if (authError || !user || !user.email || !ADMIN_EMAILS.includes(user.email)) {
+      return new Response(JSON.stringify({ error: "Unauthorized: Admin access required" }), { status: 401 });
     }
+
+    const { email, plan_type } = await req.json();
 
     if (!email || !plan_type) {
       return new Response(JSON.stringify({ error: "Email and plan_type are required" }), { status: 400 });
@@ -48,11 +48,11 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
-    const authHeader = req.headers.get('Authorization');
-    const correctPassword = process.env.ADMIN_PASSWORD;
-    
-    if (!correctPassword || authHeader !== `Bearer ${correctPassword}`) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401 });
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user || !user.email || !ADMIN_EMAILS.includes(user.email)) {
+      return new Response(JSON.stringify({ error: "Unauthorized: Admin access required" }), { status: 401 });
     }
 
     const { data, error } = await supabase

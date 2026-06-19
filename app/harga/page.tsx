@@ -10,7 +10,7 @@ export default function HargaPage() {
       color: "#3B82F6",
       gradient: "linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)",
       features: [
-        "25 pertanyaan per hari",
+        "Akses chat tanpa batas (Unlimited)",
         "Riwayat konsultasi tersimpan",
         "Analisis dokumen & faktur pajak",
         "Respons prioritas AI",
@@ -28,7 +28,7 @@ export default function HargaPage() {
       gradient: "linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)",
       savings: "Hemat Rp 48.000",
       features: [
-        "25 pertanyaan per hari",
+        "Akses chat tanpa batas (Unlimited)",
         "Riwayat konsultasi tersimpan",
         "Analisis dokumen & faktur pajak",
         "Respons prioritas AI",
@@ -47,7 +47,7 @@ export default function HargaPage() {
       gradient: "linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)",
       savings: "Hemat Rp 339.000",
       features: [
-        "25 pertanyaan per hari",
+        "Akses chat tanpa batas (Unlimited)",
         "Riwayat konsultasi tersimpan",
         "Analisis dokumen & faktur pajak",
         "Respons prioritas AI",

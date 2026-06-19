@@ -1,50 +1,37 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export default function AdminDashboard() {
-  const [password, setPassword] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [email, setEmail] = useState("");
   const [planType, setPlanType] = useState("1_bulan");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const fetchSubscriptions = async () => {
     try {
-      const res = await fetch("/api/admin/subscriptions", {
-        headers: { Authorization: `Bearer ${password}` },
-      });
+      const res = await fetch("/api/admin/subscriptions");
       if (res.ok) {
         const data = await res.json();
         setSubscriptions(data.data || []);
+        setIsAuthenticated(true);
+      } else {
+        setIsAuthenticated(false);
+        setErrorMessage("Akses Ditolak: Anda bukan Admin atau belum login.");
       }
     } catch (err) {
       console.error(err);
+      setIsAuthenticated(false);
     }
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      // Test the password by fetching subscriptions
-      const res = await fetch("/api/admin/subscriptions", {
-        headers: { Authorization: `Bearer ${password}` },
-      });
-      if (res.ok) {
-        setIsAuthenticated(true);
-        const data = await res.json();
-        setSubscriptions(data.data || []);
-      } else {
-        setMessage("Password salah!");
-      }
-    } catch (err) {
-      setMessage("Terjadi kesalahan.");
-    }
-    setLoading(false);
-  };
+  useEffect(() => {
+    fetchSubscriptions();
+  }, []);
 
   const handleActivate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +43,6 @@ export default function AdminDashboard() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          admin_password: password,
           email,
           plan_type: planType,
         }),
@@ -76,28 +62,24 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
-  if (!isAuthenticated) {
+  if (isAuthenticated === null) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", fontFamily: "Inter, sans-serif" }}>
-        <form onSubmit={handleLogin} style={{ background: "white", padding: "40px", borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.05)", width: "100%", maxWidth: "400px" }}>
-          <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#0B1B3B", marginBottom: "20px", textAlign: "center" }}>Admin Login</h1>
-          {message && <div style={{ color: "#EF4444", marginBottom: "16px", fontSize: "14px", textAlign: "center" }}>{message}</div>}
-          <input
-            type="password"
-            placeholder="Masukkan Password Admin"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ width: "100%", padding: "12px", border: "1px solid #D1D5DB", borderRadius: "8px", marginBottom: "16px", outline: "none", fontSize: "15px" }}
-            required
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            style={{ width: "100%", padding: "12px", background: "#3B82F6", color: "white", border: "none", borderRadius: "8px", fontWeight: 600, cursor: loading ? "not-allowed" : "pointer" }}
-          >
-            {loading ? "Mengecek..." : "Masuk"}
-          </button>
-        </form>
+        <p style={{ color: "#6B7280" }}>Memeriksa otentikasi admin...</p>
+      </div>
+    );
+  }
+
+  if (isAuthenticated === false) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", fontFamily: "Inter, sans-serif" }}>
+        <div style={{ background: "white", padding: "40px", borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.05)", width: "100%", maxWidth: "400px", textAlign: "center" }}>
+          <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#991B1B", marginBottom: "16px" }}>Akses Ditolak</h1>
+          <p style={{ color: "#374151", marginBottom: "24px" }}>{errorMessage}</p>
+          <Link href="/login" style={{ display: "inline-block", padding: "12px 24px", background: "#3B82F6", color: "white", textDecoration: "none", borderRadius: "8px", fontWeight: 600 }}>
+            Ke Halaman Login
+          </Link>
+        </div>
       </div>
     );
   }
