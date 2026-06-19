@@ -55,8 +55,8 @@ export async function POST(req: Request) {
   if (rawMessages.length > 0) {
     const last = rawMessages[rawMessages.length - 1];
     console.log('[route] last message role:', last.role);
-    console.log('[route] last message content:', JSON.stringify(last.content).slice(0, 100));
-    console.log('[route] last message parts:', JSON.stringify(last.parts).slice(0, 200));
+    console.log('[route] last message content:', String(last.content).slice(0, 100));
+    console.log('[route] last message parts:', JSON.stringify(last.parts || []).slice(0, 200));
   }
 
   let userMsgCount = 0;
