@@ -184,8 +184,6 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
-  overflow: hidden;
-  height: 100vh;
 }
 
 /* Scrollbar */
