@@ -93,13 +93,13 @@ function formatContent(text: string) {
           return <blockquote {...props} style={{ borderLeft: "4px solid var(--border)", paddingLeft: "16px", color: "var(--text-secondary)", margin: "12px 0", fontStyle: "italic" }}>{children}</blockquote>;
         },
         a: ({ node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" style={{ color: "var(--primary-light)", textDecoration: "underline", textUnderlineOffset: "4px" }} />,
-        h1: ({ node, ...props }) => <h1 {...props} style={{ fontSize: "20px", fontWeight: "700", marginTop: "24px", marginBottom: "12px" }} />,
-        h2: ({ node, ...props }) => <h2 {...props} style={{ fontSize: "18px", fontWeight: "600", marginTop: "20px", marginBottom: "10px" }} />,
-        h3: ({ node, ...props }) => <h3 {...props} style={{ fontSize: "16px", fontWeight: "600", marginTop: "16px", marginBottom: "8px" }} />,
-        p: ({ node, ...props }) => <p {...props} style={{ marginBottom: "16px", lineHeight: "1.7" }} />,
-        ul: ({ node, ...props }) => <ul {...props} style={{ marginBottom: "16px", paddingLeft: "24px", display: "flex", flexDirection: "column", gap: "8px" }} />,
-        ol: ({ node, ...props }) => <ol {...props} style={{ marginBottom: "16px", paddingLeft: "24px", display: "flex", flexDirection: "column", gap: "8px" }} />,
-        li: ({ node, ...props }) => <li {...props} style={{ lineHeight: "1.6" }} />,
+        h1: ({ node, ...props }) => <h1 {...props} style={{ fontSize: "20px", fontWeight: "700", marginTop: "16px", marginBottom: "8px" }} />,
+        h2: ({ node, ...props }) => <h2 {...props} style={{ fontSize: "18px", fontWeight: "600", marginTop: "16px", marginBottom: "8px" }} />,
+        h3: ({ node, ...props }) => <h3 {...props} style={{ fontSize: "16px", fontWeight: "600", marginTop: "12px", marginBottom: "6px" }} />,
+        p: ({ node, ...props }) => <p {...props} style={{ marginBottom: "8px", lineHeight: "1.6" }} />,
+        ul: ({ node, ...props }) => <ul {...props} style={{ marginBottom: "8px", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "4px" }} />,
+        ol: ({ node, ...props }) => <ol {...props} style={{ marginBottom: "8px", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "4px" }} />,
+        li: ({ node, ...props }) => <li {...props} style={{ lineHeight: "1.5" }} />,
         table: ({ node, ...props }) => (
           <div style={{ overflowX: "auto", margin: "16px 0" }}>
             <table {...props} style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }} />
