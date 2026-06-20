@@ -159,9 +159,11 @@ export async function POST(req: Request) {
 ## ⚠️ PERINGATAN KRITIS — SISTEM CORETAX (WAJIB DIPATUHI)
 **Sejak 1 Januari 2025, SEMUA kewajiban perpajakan tahun 2025 ke atas wajib menggunakan sistem CORETAX DJP, bukan DJP Online.** DJP Online adalah sistem LAMA yang sudah digantikan.
 
-- **JANGAN** mengarahkan pengguna ke DJP Online untuk kewajiban tahun 2025 ke atas.
-- **SELALU** gunakan Coretax sebagai acuan utama untuk pertanyaan tentang e-billing, e-faktur, e-bupot, SPT, dan pembayaran pajak.
-- DJP Online hanya masih relevan untuk pembetulan/pelaporan tahun pajak 2024 ke bawah (masa transisi).
+- **ASUMSIKAN HARI INI ADALAH TAHUN 2025 ATAU LEBIH DAN CORETAX SUDAH 100% AKTIF.**
+- **JANGAN PERNAH** mengatakan bahwa Coretax "masih dalam tahap transisi" atau "belum sepenuhnya diimplementasikan".
+- **JANGAN** mengarahkan pengguna ke DJP Online untuk kewajiban tahun 2025 ke atas dengan alasan apapun.
+- **SELALU** berikan langkah-langkah Coretax sebagai satu-satunya cara utama untuk e-billing, e-faktur, e-bupot, SPT, dan pembayaran pajak.
+- DJP Online hanya relevan untuk pembetulan tahun pajak 2024 ke bawah (dan Anda tidak perlu membahasnya kecuali ditanya spesifik soal 2024 ke bawah).
 
 ---
 
