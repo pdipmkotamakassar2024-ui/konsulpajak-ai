@@ -83,13 +83,27 @@ export async function POST(req: Request) {
       if (!hasActiveSubscription) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const { count } = await supabase
-          .from('messages')
-          .select('id', { count: 'exact', head: true })
-          .eq('role', 'user')
-          .gte('created_at', today.toISOString());
-        
-        userMsgCount = count || 0;
+
+        // Ambil semua chat_id milik user ini
+        const { data: userChats } = await supabase
+          .from('chats')
+          .select('id')
+          .eq('user_id', user.id);
+
+        const chatIds = userChats?.map((c) => c.id) || [];
+
+        if (chatIds.length > 0) {
+          const { count } = await supabase
+            .from('messages')
+            .select('id', { count: 'exact', head: true })
+            .eq('role', 'user')
+            .in('chat_id', chatIds)
+            .gte('created_at', today.toISOString());
+          
+          userMsgCount = count || 0;
+        } else {
+          userMsgCount = 0;
+        }
       }
     }
   } catch (err: any) {
@@ -177,17 +191,36 @@ export async function POST(req: Request) {
 - **Pengguna baru:** Pilih "Aktivasi Akun Wajib Pajak" atau "Daftar di Sini".
 - **Kode Otorisasi:** Wajib dibuat setelah aktivasi — digunakan untuk menandatangani transaksi pajak digital.
 
-### 💳 Cara Membuat E-Billing (Kode Billing) di Coretax
-1. Buka https://coretaxdjp.pajak.go.id dan login.
-2. Pilih menu **"Pembayaran"** di halaman utama.
-3. Pilih **"Layanan Mandiri Kode Billing"**.
-4. Pastikan data identitas Wajib Pajak yang muncul sudah benar.
-5. Pilih **Kode Akun Pajak (KAP)** dan **Kode Jenis Setoran (KJS)** sesuai jenis pajak.
-6. Isi masa pajak, tahun pajak, dan nominal yang akan disetor.
-7. Klik **"Buat Kode Billing"** — sistem otomatis menghasilkan kode billing yang bisa diunduh/disimpan.
-8. **Masa berlaku kode billing: 7 hari** sejak diterbitkan. Jika kedaluwarsa, buat ulang.
+### 🔑 Cara Membuat E-Billing (Kode Billing) di Coretax
+Terdapat 3 (tiga) skema pembuatan kode billing di Coretax DJP:
 
-> **Alternatif cepat:** Jika membuat billing terkait SPT, klik **"Bayar dan Lapor"** pada konsep SPT yang sudah selesai — sistem akan otomatis membuat kode billing untuk nominal kurang bayar.
+**Skema 1: Cara Membuat Kode Billing Mandiri (Layanan Mandiri)**
+Digunakan untuk bayar pajak di luar pelaporan SPT atau tagihan resmi (misal PPh Final UMKM).
+1. Buka https://coretaxdjp.pajak.go.id dan login menggunakan NIK/NPWP 16 digit.
+2. Pilih menu **"Pembayaran"**.
+3. Klik opsi **"Layanan Mandiri Kode Billing"**.
+4. Pilih Kode Akun Pajak (KAP) dan Kode Jenis Setoran (KJS) yang sesuai.
+5. Isi Masa Pajak, Tahun Pajak, dan Nominal pajak.
+6. Klik **"Buat Kode Billing"**. Sistem akan menerbitkan 15 digit angka Kode Billing.
+
+**Skema 2: Cara Membuat Kode Billing Saat Pelaporan SPT**
+Sangat dipermudah saat lapor SPT yang berstatus Kurang Bayar.
+1. Isi konsep SPT di menu **"Surat Pemberitahuan"**.
+2. Jika status Kurang Bayar, gulir ke bagian paling bawah formulir SPT.
+3. Klik tombol **"Simpan Konsep dan Bayar dan Lapor"**.
+4. Akan muncul pop-up, klik **"Buat Billing Mandiri"**.
+5. Sistem otomatis mengisi KAP, KJS, dan nominal. Kode billing otomatis terbit untuk dibayar.
+
+**Skema 3: Pembuatan Kode Billing Atas Tagihan Pajak (SKP/STP)**
+Jika menerima Surat Tagihan Pajak (STP) atau SKP.
+1. Login ke portal Coretax.
+2. Pilih menu **"Pembayaran"**, lalu klik **"Layanan Pembuatan Kode Billing Atas Tagihan Pajak"**.
+3. Sistem akan otomatis menampilkan daftar tagihan yang belum lunas.
+4. Centang tagihan yang ingin dibayar, lalu isi "Jumlah yang akan dibayar".
+5. Klik **"Buat Kode Billing"**.
+
+> [!NOTE]
+> **Masa Berlaku Kode Billing Coretax adalah 7x24 jam (7 hari kalender)**. Jika kedaluwarsa sebelum dibayar, Anda cukup membuat kode billing baru tanpa denda (selama belum lewat jatuh tempo penyetoran bulanan/tahunan).
 
 ### 🧾 E-Faktur di Coretax
 - Pembuatan faktur pajak keluaran dan pengkreditan pajak masukan dilakukan **langsung di dalam sistem Coretax**.
