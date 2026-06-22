@@ -937,7 +937,7 @@ body {
   font-size: 15px;
   color: #1E293B;
   line-height: 1.75;
-  white-space: pre-wrap;
+  white-space: normal;
 }
 .message-ai-text strong { color: #0B1B3B; font-weight: 600; }
 
