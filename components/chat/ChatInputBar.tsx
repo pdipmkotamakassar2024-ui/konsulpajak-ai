@@ -2,9 +2,11 @@
 
 import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
+import type { ChatAttachment } from "@/lib/chat/types";
+import { stripDataUrlPrefix, validateAttachmentList } from "@/lib/chat/attachments";
 
 interface ChatInputBarProps {
-  onSend: (message: string, attachments?: File[]) => void;
+  onSend: (message: string, attachments?: ChatAttachment[]) => void | Promise<void>;
   isLoading: boolean;
 }
 
@@ -12,6 +14,7 @@ export default function ChatInputBar({ onSend, isLoading }: ChatInputBarProps) {
   const [value, setValue] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [isPreparing, setIsPreparing] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -44,6 +47,13 @@ export default function ChatInputBar({ onSend, isLoading }: ChatInputBarProps) {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const newFiles = Array.from(e.target.files);
+      const validationError = validateAttachmentList([...files, ...newFiles]);
+      if (validationError) {
+        window.alert(validationError);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        return;
+      }
+
       setFiles(prev => [...prev, ...newFiles]);
       
       const newPreviews = newFiles.map(file => URL.createObjectURL(file));
@@ -63,14 +73,45 @@ export default function ChatInputBar({ onSend, isLoading }: ChatInputBarProps) {
     });
   };
 
-  const handleSend = () => {
+  const fileToAttachment = (file: File) =>
+    new Promise<ChatAttachment>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        resolve({
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          data: stripDataUrlPrefix(String(reader.result || "")),
+        });
+      };
+      reader.onerror = () => reject(new Error(`Gagal membaca file ${file.name}`));
+      reader.readAsDataURL(file);
+    });
+
+  const handleSend = async () => {
     const trimmed = value.trim();
-    if ((!trimmed && files.length === 0) || isLoading) return;
+    if ((!trimmed && files.length === 0) || isLoading || isPreparing) return;
+
+    const validationError = validateAttachmentList(files);
+    if (validationError) {
+      window.alert(validationError);
+      return;
+    }
     
-    onSend(trimmed, files.length > 0 ? files : undefined);
+    try {
+      setIsPreparing(true);
+      const attachments = files.length > 0 ? await Promise.all(files.map(fileToAttachment)) : undefined;
+      await onSend(trimmed, attachments);
+    } catch (error: any) {
+      window.alert(error?.message || "Gagal menyiapkan lampiran.");
+      return;
+    } finally {
+      setIsPreparing(false);
+    }
     
     setValue("");
     setFiles([]);
+    previews.forEach(url => URL.revokeObjectURL(url));
     setPreviews([]);
     if (textareaRef.current) {
       textareaRef.current.style.height = "24px";
@@ -158,7 +199,7 @@ export default function ChatInputBar({ onSend, isLoading }: ChatInputBarProps) {
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   cursor: 'pointer', fontSize: '12px'
                 }}
-                aria-label="Remove image"
+                aria-label="Hapus lampiran"
               >
                 ✕
               </button>
@@ -186,7 +227,7 @@ export default function ChatInputBar({ onSend, isLoading }: ChatInputBarProps) {
           title="Upload dokumen/gambar"
           aria-label="Upload dokumen"
           onClick={() => fileInputRef.current?.click()}
-          disabled={isLoading}
+          disabled={isLoading || isPreparing}
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
@@ -200,7 +241,7 @@ export default function ChatInputBar({ onSend, isLoading }: ChatInputBarProps) {
             title={isRecording ? "Hentikan merekam" : "Mulai merekam suara (Voice Note)"}
             aria-label="Voice Note"
             onClick={toggleRecording}
-            disabled={isLoading}
+            disabled={isLoading || isPreparing}
             style={{ color: isRecording ? "#ef4444" : "inherit" }}
           >
             {isRecording ? (
@@ -228,7 +269,7 @@ export default function ChatInputBar({ onSend, isLoading }: ChatInputBarProps) {
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           rows={1}
-          disabled={isLoading}
+          disabled={isLoading || isPreparing}
           aria-label="Input pertanyaan pajak"
         />
 
@@ -246,11 +287,11 @@ export default function ChatInputBar({ onSend, isLoading }: ChatInputBarProps) {
             id="send-message-btn"
             className="send-btn"
             onClick={handleSend}
-            disabled={(!value.trim() && files.length === 0) || isLoading}
+            disabled={(!value.trim() && files.length === 0) || isLoading || isPreparing}
             title="Kirim (Enter)"
             aria-label="Kirim pesan"
           >
-            {isLoading ? (
+            {isLoading || isPreparing ? (
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ animation: "spin 1s linear infinite" }}>
                 <circle cx="12" cy="12" r="10" />
                 <path d="M12 6v6l4 2" />

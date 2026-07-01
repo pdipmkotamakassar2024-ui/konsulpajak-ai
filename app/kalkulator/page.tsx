@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Link from "next/link";
 import {
   PTKP_OPTIONS,
   PTKP,
@@ -327,10 +328,10 @@ export default function KalkulatorPage() {
     <div className="kalk-shell">
     <div className="kalk-page">
       {/* Back Button */}
-      <a href="/" className="kalk-back-btn">
+      <Link href="/" className="kalk-back-btn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         Kembali ke Chat
-      </a>
+      </Link>
 
       {/* Header */}
       <div className="kalk-header">
@@ -461,7 +462,7 @@ export default function KalkulatorPage() {
         .kalk-input {
           flex: 1; padding: 0 14px; height: 44px; font-size: 15px; font-weight: 500;
           border: none; outline: none; background: transparent;
-          color: var(--text-primary); font-family: 'Inter', monospace;
+          color: var(--text-primary); font-family: var(--font-inter), monospace;
           text-align: right;
         }
         .kalk-input:disabled { background: var(--bg-surface-2); color: var(--text-faint); }
@@ -520,7 +521,7 @@ export default function KalkulatorPage() {
         }
         .kalk-result-row.info { background: rgba(0,0,0,0.02); }
         .kalk-result-label { font-weight: 500; }
-        .kalk-result-value { font-weight: 600; font-family: 'Inter', monospace; font-size: 14px; }
+        .kalk-result-value { font-weight: 600; font-family: var(--font-inter), monospace; font-size: 14px; }
         .rate-badge {
           background: var(--primary); color: white; font-size: 12px;
           padding: 3px 10px; border-radius: 99px; font-weight: 700;

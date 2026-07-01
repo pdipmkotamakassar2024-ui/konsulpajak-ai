@@ -1,7 +1,22 @@
 import type { Metadata } from "next";
+import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://konsulpajak-ai.com";
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+const poppins = Poppins({
+  subsets: ["latin"],
+  variable: "--font-poppins",
+  display: "swap",
+  weight: ["400", "600", "700", "800", "900"],
+});
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "KonsulPajak AI — Konsultan Pajak Pribadi untuk UMKM & Profesional",
   description:
     "Konsultasi pajak Indonesia berbasis AI. Hitung pajak, pahami aturan DJP, dan lapor SPT dengan mudah. Didukung database >10.000 peraturan pajak resmi.",
@@ -21,7 +36,7 @@ export const metadata: Metadata = {
       "Pusing urus pajak? Biar AI yang hitung & jelaskan. Konsultan pajak untuk UMKM dan Profesional.",
     type: "website",
     locale: "id_ID",
-    url: "https://konsulpajak-ai.com",
+    url: siteUrl,
     siteName: "KonsulPajak AI",
     images: [
       {
@@ -49,20 +64,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" suppressHydrationWarning>
-      <head>
-        {/* Next.js automatically injects the icon.png from the app directory */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@400;600;700;800;900&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+    <html lang="id" className={`${inter.variable} ${poppins.variable}`} suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );

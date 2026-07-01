@@ -1,10 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  typescript: {
-    // Disable TypeScript errors during build — errors are caught in dev
-    ignoreBuildErrors: true,
-  },
   images: {
     remotePatterns: [
       {
@@ -27,6 +23,17 @@ const nextConfig: NextConfig = {
       {
         source: "/auth/register",
         destination: "/login",
+        permanent: true,
+      },
+      {
+        source: "/:path*",
+        has: [
+          {
+            type: "host",
+            value: "www.konsulpajak-ai.com",
+          },
+        ],
+        destination: "https://konsulpajak-ai.com/:path*",
         permanent: true,
       },
     ];

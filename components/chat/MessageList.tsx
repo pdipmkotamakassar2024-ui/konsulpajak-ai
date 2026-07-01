@@ -18,7 +18,7 @@ function formatContent(text: string) {
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
       components={{
-        blockquote: ({ node, children, ...props }) => {
+        blockquote: ({ children, ...props }) => {
           // Check if this is a GitHub style alert (e.g. > [!NOTE], > [!WARNING], > [!IMPORTANT])
           let contentStr = "";
           if (children && Array.isArray(children)) {
@@ -59,7 +59,7 @@ function formatContent(text: string) {
             }
 
             // Extract the actual content without the tag
-            let parsedChildren: any = React.Children.map(children, (child: any) => {
+            const parsedChildren: any = React.Children.map(children, (child: any) => {
               if (typeof child === "string") {
                 return child.replace(/\[!(NOTE|WARNING|IMPORTANT)\]/, "");
               } else if (child && child.props && child.props.children) {
@@ -92,21 +92,21 @@ function formatContent(text: string) {
           // Normal blockquote
           return <blockquote {...props} style={{ borderLeft: "4px solid var(--border)", paddingLeft: "16px", color: "var(--text-secondary)", margin: "12px 0", fontStyle: "italic" }}>{children}</blockquote>;
         },
-        a: ({ node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" style={{ color: "var(--primary-light)", textDecoration: "underline", textUnderlineOffset: "4px" }} />,
-        h1: ({ node, ...props }) => <h1 {...props} style={{ fontSize: "20px", fontWeight: "700", marginTop: "16px", marginBottom: "8px" }} />,
-        h2: ({ node, ...props }) => <h2 {...props} style={{ fontSize: "18px", fontWeight: "600", marginTop: "16px", marginBottom: "8px" }} />,
-        h3: ({ node, ...props }) => <h3 {...props} style={{ fontSize: "16px", fontWeight: "600", marginTop: "12px", marginBottom: "6px" }} />,
-        p: ({ node, ...props }) => <p {...props} style={{ marginBottom: "8px", lineHeight: "1.6" }} />,
-        ul: ({ node, ...props }) => <ul {...props} style={{ marginBottom: "8px", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "4px" }} />,
-        ol: ({ node, ...props }) => <ol {...props} style={{ marginBottom: "8px", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "4px" }} />,
-        li: ({ node, ...props }) => <li {...props} style={{ lineHeight: "1.5" }} />,
-        table: ({ node, ...props }) => (
+        a: ({ ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" style={{ color: "var(--primary-light)", textDecoration: "underline", textUnderlineOffset: "4px" }} />,
+        h1: ({ ...props }) => <h1 {...props} style={{ fontSize: "20px", fontWeight: "700", marginTop: "16px", marginBottom: "8px" }} />,
+        h2: ({ ...props }) => <h2 {...props} style={{ fontSize: "18px", fontWeight: "600", marginTop: "16px", marginBottom: "8px" }} />,
+        h3: ({ ...props }) => <h3 {...props} style={{ fontSize: "16px", fontWeight: "600", marginTop: "12px", marginBottom: "6px" }} />,
+        p: ({ ...props }) => <p {...props} style={{ marginBottom: "8px", lineHeight: "1.6" }} />,
+        ul: ({ ...props }) => <ul {...props} style={{ marginBottom: "8px", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "4px" }} />,
+        ol: ({ ...props }) => <ol {...props} style={{ marginBottom: "8px", paddingLeft: "20px", display: "flex", flexDirection: "column", gap: "4px" }} />,
+        li: ({ ...props }) => <li {...props} style={{ lineHeight: "1.5" }} />,
+        table: ({ ...props }) => (
           <div style={{ overflowX: "auto", margin: "16px 0" }}>
             <table {...props} style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }} />
           </div>
         ),
-        th: ({ node, ...props }) => <th {...props} style={{ border: "1px solid var(--border)", padding: "8px 12px", background: "rgba(255,255,255,0.05)", textAlign: "left" }} />,
-        td: ({ node, ...props }) => <td {...props} style={{ border: "1px solid var(--border)", padding: "8px 12px" }} />,
+        th: ({ ...props }) => <th {...props} style={{ border: "1px solid var(--border)", padding: "8px 12px", background: "rgba(255,255,255,0.05)", textAlign: "left" }} />,
+        td: ({ ...props }) => <td {...props} style={{ border: "1px solid var(--border)", padding: "8px 12px" }} />,
       }}
     >
       {text}

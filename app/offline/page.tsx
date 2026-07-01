@@ -76,7 +76,7 @@ export default function OfflineConsultationPage() {
 
         {/* CTA Button */}
         <a 
-          href="https://wa.me/6281234567890" 
+          href="https://wa.me/6285256276676" 
           target="_blank" 
           rel="noopener noreferrer"
           style={{

@@ -5,8 +5,8 @@ import Link from "next/link";
 import { User } from "@supabase/supabase-js";
 import { logout } from "@/app/auth/actions";
 import { useState, useEffect } from "react";
-import { createClient } from "@/utils/supabase/client";
 import { suggestions } from "./WelcomeState";
+import type { ChatSummary } from "@/lib/chat/types";
 
 const tools = [
   {
@@ -50,26 +50,30 @@ interface SidebarProps {
   onSelectChat?: (id: string) => void;
   onPromptClick?: (prompt: string) => void;
   user?: User | null;
+  refreshKey?: number;
 }
 
-export default function Sidebar({ isOpen, onClose, onNewChat, onSelectChat, onPromptClick, user }: SidebarProps) {
-  const [recentChats, setRecentChats] = useState<{id: string, title: string}[]>([]);
+export default function Sidebar({ isOpen, onClose, onNewChat, onSelectChat, onPromptClick, user, refreshKey = 0 }: SidebarProps) {
+  const [recentChats, setRecentChats] = useState<ChatSummary[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const supabase = createClient();
 
   useEffect(() => {
+    let cancelled = false;
+
     if (user) {
-      supabase.from('chats')
-        .select('id, title')
-        .order('created_at', { ascending: false })
-        .limit(20)
+      fetch("/api/chats")
+        .then((res) => res.ok ? res.json() : { data: [] })
         .then(({ data }) => {
-          if (data) setRecentChats(data);
+          if (!cancelled) setRecentChats(data || []);
         });
     } else {
       setRecentChats([]);
     }
-  }, [user]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, refreshKey]);
 
   const filteredChats = recentChats.filter(chat => 
     chat.title.toLowerCase().includes(searchQuery.toLowerCase())

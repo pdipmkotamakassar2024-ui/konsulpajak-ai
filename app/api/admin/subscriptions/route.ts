@@ -1,6 +1,14 @@
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 
 const ADMIN_EMAILS = ['pdipmkotamakassar2024@gmail.com', 'ziqranraihan@gmail.com'];
+
+function json(data: unknown, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
 
 export async function POST(req: Request) {
   try {
@@ -8,13 +16,13 @@ export async function POST(req: Request) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user || !user.email || !ADMIN_EMAILS.includes(user.email)) {
-      return new Response(JSON.stringify({ error: "Unauthorized: Admin access required" }), { status: 401 });
+      return json({ error: "Unauthorized: Admin access required" }, 401);
     }
 
     const { email, plan_type } = await req.json();
 
     if (!email || !plan_type) {
-      return new Response(JSON.stringify({ error: "Email and plan_type are required" }), { status: 400 });
+      return json({ error: "Email and plan_type are required" }, 400);
     }
 
     const expiresAt = new Date();
@@ -25,47 +33,49 @@ export async function POST(req: Request) {
     } else if (plan_type === '1_tahun') {
       expiresAt.setFullYear(expiresAt.getFullYear() + 1);
     } else {
-      return new Response(JSON.stringify({ error: "Invalid plan_type" }), { status: 400 });
+      return json({ error: "Invalid plan_type" }, 400);
     }
 
-    const { data, error } = await supabase
+    const admin = createAdminClient();
+    const { data, error } = await admin
       .from('subscriptions')
       .upsert(
-        { email, plan_type, expires_at: expiresAt.toISOString() },
+        { email, plan_type, expires_at: expiresAt.toISOString(), updated_at: new Date().toISOString() },
         { onConflict: 'email' }
       )
       .select();
 
     if (error) {
-      return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+      return json({ error: error.message }, 500);
     }
 
-    return new Response(JSON.stringify({ success: true, data }), { status: 200 });
+    return json({ success: true, data });
   } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+    return json({ error: err.message }, 500);
   }
 }
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user || !user.email || !ADMIN_EMAILS.includes(user.email)) {
-      return new Response(JSON.stringify({ error: "Unauthorized: Admin access required" }), { status: 401 });
+      return json({ error: "Unauthorized: Admin access required" }, 401);
     }
 
-    const { data, error } = await supabase
+    const admin = createAdminClient();
+    const { data, error } = await admin
       .from('subscriptions')
       .select('*')
       .order('expires_at', { ascending: false });
 
     if (error) {
-      return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+      return json({ error: error.message }, 500);
     }
 
-    return new Response(JSON.stringify({ success: true, data }), { status: 200 });
+    return json({ success: true, data });
   } catch (err: any) {
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+    return json({ error: err.message }, 500);
   }
 }

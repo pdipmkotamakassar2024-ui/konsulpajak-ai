@@ -41,7 +41,7 @@ export default function LoginPage() {
       alignItems: "center",
       justifyContent: "center",
       padding: "24px",
-      fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+      fontFamily: "var(--font-inter), system-ui, -apple-system, sans-serif",
       position: "relative",
       overflow: "hidden",
     }}>

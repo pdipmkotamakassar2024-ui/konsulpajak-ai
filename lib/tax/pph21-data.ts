@@ -262,7 +262,9 @@ export function calcPasal17(pkp: number): number {
   let tax = 0;
   let remaining = pkp;
   let prevMax = 0;
-  for (const [min, max, rate] of PASAL_17) {
+  for (const bracketDef of PASAL_17) {
+    const max = bracketDef[1];
+    const rate = bracketDef[2];
     if (remaining <= 0) break;
     const bracket = (max === Infinity ? remaining : Math.min(max, pkp)) - prevMax;
     const taxable = Math.min(remaining, bracket);

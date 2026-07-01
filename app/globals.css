@@ -181,7 +181,7 @@ html { scroll-behavior: smooth; }
 body {
   background: linear-gradient(180deg, #F8FAFC 0%, #EEF4FF 100%);
   color: #0B1B3B;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
@@ -619,7 +619,7 @@ body {
 
 /* Typography — Poppins ExtraBold */
 .welcome-greeting {
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-poppins), sans-serif;
   font-size: clamp(36px, 5vw, 54px);
   font-weight: 800;
   color: #0B1B3B;
@@ -646,7 +646,7 @@ body {
 }
 
 .welcome-subtitle {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-inter), sans-serif;
   font-size: 22px;
   font-weight: 400;
   color: #6B7280;

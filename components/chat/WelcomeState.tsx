@@ -213,7 +213,7 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
         style={{
           textAlign: "center",
           marginBottom: "4px",
-          fontFamily: "'Poppins', sans-serif",
+          fontFamily: "var(--font-poppins), sans-serif",
           fontSize: "clamp(20px, 2vw, 28px)",
           fontWeight: 800,
           color: "#0B1B3B",
@@ -230,7 +230,7 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
           textAlign: "center",
           marginTop: "0px",
           marginBottom: "0px",
-          fontFamily: "'Poppins', sans-serif",
+          fontFamily: "var(--font-poppins), sans-serif",
           fontSize: "clamp(26px, 3.5vw, 42px)",
           fontWeight: 800,
           lineHeight: 1.2,
@@ -267,7 +267,7 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
         className="animate-fade-up-2"
         style={{
           marginBottom: "24px",
-          fontFamily: "'Inter', sans-serif",
+          fontFamily: "var(--font-inter), sans-serif",
           fontSize: "15px",
           fontWeight: 400,
           color: "#6B7280",
@@ -276,6 +276,21 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
       >
         Asisten Konsultan Pajak Coretax Anda.
       </p>
+
+      <div className="suggestions-grid animate-fade-up-3" style={{ position: "relative", zIndex: 1, maxWidth: "720px" }}>
+        {suggestions.map((item) => (
+          <button
+            key={item.title}
+            type="button"
+            className="suggestion-card"
+            onClick={() => onPromptClick(item.prompt)}
+          >
+            <span className="suggestion-icon">{item.icon}</span>
+            <span className="suggestion-title">{item.title}</span>
+            <span className="suggestion-desc">{item.desc}</span>
+          </button>
+        ))}
+      </div>
 
       {/* ===== Wave SVG di bagian bawah container ===== */}
       <div

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function HargaPage() {
   const plans = [
     {
@@ -65,7 +67,7 @@ export default function HargaPage() {
     <div style={{
       minHeight: "100vh",
       background: "linear-gradient(180deg, #F8FAFC 0%, #EEF4FF 100%)",
-      fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+      fontFamily: "var(--font-inter), system-ui, -apple-system, sans-serif",
       padding: "60px 24px 80px",
     }}>
       {/* Header */}
@@ -82,7 +84,7 @@ export default function HargaPage() {
           <span>⚡</span> Akses Tanpa Batas
         </div>
         <h1 style={{
-          fontFamily: "'Poppins', sans-serif",
+          fontFamily: "var(--font-poppins), sans-serif",
           fontSize: "clamp(28px, 4vw, 48px)",
           fontWeight: 800,
           color: "#0B1B3B",
@@ -180,7 +182,7 @@ export default function HargaPage() {
               <div style={{ display: "flex", alignItems: "baseline", gap: "4px" }}>
                 <span style={{ fontSize: "13px", fontWeight: 600, color: "#6B7280", marginTop: "4px" }}>Rp</span>
                 <span style={{
-                  fontFamily: "'Poppins', sans-serif",
+                  fontFamily: "var(--font-poppins), sans-serif",
                   fontSize: "42px",
                   fontWeight: 800,
                   color: "#0B1B3B",
@@ -275,13 +277,13 @@ export default function HargaPage() {
 
       {/* Back button */}
       <div style={{ textAlign: "center", marginTop: "48px" }}>
-        <a href="/" style={{
+        <Link href="/" style={{
           color: "#3B82F6", fontSize: "14px", textDecoration: "none",
           display: "inline-flex", alignItems: "center", gap: "4px",
           fontWeight: 500,
         }}>
           ← Kembali ke Konsultasi
-        </a>
+        </Link>
       </div>
     </div>
   );

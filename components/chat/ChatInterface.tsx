@@ -10,48 +10,16 @@ import MessageList from "./MessageList";
 import ChatInputBar from "./ChatInputBar";
 
 import { User } from "@supabase/supabase-js";
-import { createClient } from "@/utils/supabase/client";
-
-// ─── Guest rate-limit helpers (5 pertanyaan per 24 jam per perangkat) ─────────
-const GUEST_LIMIT = 5;
-const GUEST_KEY = "guestRateLimit";
-
-interface GuestRateData {
-  count: number;
-  resetAt: number; // timestamp ms
-}
-
-function getGuestData(): GuestRateData {
-  try {
-    const raw = localStorage.getItem(GUEST_KEY);
-    if (!raw) return { count: 0, resetAt: Date.now() + 24 * 60 * 60 * 1000 };
-    const parsed: GuestRateData = JSON.parse(raw);
-    if (Date.now() > parsed.resetAt) {
-      const fresh = { count: 0, resetAt: Date.now() + 24 * 60 * 60 * 1000 };
-      localStorage.setItem(GUEST_KEY, JSON.stringify(fresh));
-      return fresh;
-    }
-    return parsed;
-  } catch {
-    return { count: 0, resetAt: Date.now() + 24 * 60 * 60 * 1000 };
-  }
-}
-
-function incrementGuestCount(): void {
-  const data = getGuestData();
-  const updated = { ...data, count: data.count + 1 };
-  localStorage.setItem(GUEST_KEY, JSON.stringify(updated));
-}
-// ─────────────────────────────────────────────────────────────────────────────
+import type { ChatAttachment, ChatSummary, StoredChatMessage } from "@/lib/chat/types";
 
 export default function ChatInterface({ user }: { user: User | null }) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
   const activeChatIdRef = useRef<string | null>(null);
+  const [chatListVersion, setChatListVersion] = useState(0);
   const [darkMode, setDarkMode] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const supabase = createClient();
 
   // ─── Dark mode ───────────────────────────────────────────────────────────
   useEffect(() => {
@@ -84,27 +52,8 @@ export default function ChatInterface({ user }: { user: User | null }) {
   // Versi ini menggunakan sendMessage (bukan append), dan DefaultChatTransport
   const { messages, status, sendMessage, setMessages } = useChat({
     transport: new TextStreamChatTransport({ api: '/api/chat' }),
-    onFinish: async (event: any) => {
-      const chatId = activeChatIdRef.current;
-      if (chatId && user && event.message) {
-        const msg = event.message;
-        const textContent =
-          typeof msg.content === 'string'
-            ? msg.content
-            : Array.isArray(msg.parts)
-            ? msg.parts
-                .filter((p: any) => p.type === 'text')
-                .map((p: any) => p.text)
-                .join('')
-            : '';
-        if (textContent) {
-          await supabase.from('messages').insert({
-            chat_id: chatId,
-            role: 'assistant',
-            content: textContent,
-          });
-        }
-      }
+    onFinish: () => {
+      if (user) setChatListVersion((value) => value + 1);
     },
   });
   // ─────────────────────────────────────────────────────────────────────────
@@ -132,11 +81,15 @@ export default function ChatInterface({ user }: { user: User | null }) {
     if (!user) return;
     setActiveChatId(id);
     setMessages([]);
-    const { data } = await supabase
-      .from('messages')
-      .select('*')
-      .eq('chat_id', id)
-      .order('created_at', { ascending: true });
+
+    const res = await fetch(`/api/chats/${id}/messages`);
+    if (!res.ok) {
+      window.alert("Gagal memuat riwayat chat.");
+      return;
+    }
+
+    const payload = await res.json();
+    const data = (payload.data || []) as StoredChatMessage[];
 
     if (data) {
       const uiMessages = data.map((msg) => ({
@@ -144,6 +97,7 @@ export default function ChatInterface({ user }: { user: User | null }) {
         role: msg.role as 'user' | 'assistant',
         content: msg.content,
         parts: [{ type: 'text' as const, text: msg.content }],
+        createdAt: msg.created_at ? new Date(msg.created_at) : undefined,
       }));
       setMessages(uiMessages as any);
     }
@@ -152,65 +106,43 @@ export default function ChatInterface({ user }: { user: User | null }) {
     }
   };
 
-  const handleSend = async (content: string, files?: File[]) => {
-    if ((!content.trim() && (!files || files.length === 0)) || isLoading) return;
+  const createChat = async (title: string) => {
+    const res = await fetch("/api/chats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title }),
+    });
 
-    // ─── GUEST RATE LIMIT ──────────────────────────────────────────────────
-    if (!user) {
-      const data = getGuestData();
-      if (data.count >= GUEST_LIMIT) {
-        const resetDate = new Date(data.resetAt);
-        const resetStr = resetDate.toLocaleString("id-ID", {
-          hour: "2-digit",
-          minute: "2-digit",
-          day: "numeric",
-          month: "long",
-        });
-        window.alert(
-          `Batas pertanyaan harian habis!\n\n` +
-          `Pengguna tamu dibatasi ${GUEST_LIMIT} pertanyaan per 24 jam.\n` +
-          `Limit akan reset pada: ${resetStr}\n\n` +
-          `Silakan Masuk/Login untuk melanjutkan konsultasi.`
-        );
-        return;
-      }
-      incrementGuestCount();
+    if (!res.ok) {
+      const payload = await res.json().catch(() => ({}));
+      throw new Error(payload.error || "Gagal membuat chat baru.");
     }
-    // ──────────────────────────────────────────────────────────────────────
+
+    const payload = await res.json();
+    return payload.data as ChatSummary;
+  };
+
+  const handleSend = async (content: string, attachments?: ChatAttachment[]) => {
+    if ((!content.trim() && (!attachments || attachments.length === 0)) || isLoading) return;
 
     let currentChatId = activeChatId;
+    const displayText = content || "Tolong analisis lampiran ini.";
 
     // Buat chat baru jika ini pesan pertama (user login)
     if (!currentChatId && user) {
-      const title =
-        content
-          ? content.substring(0, 50) + (content.length > 50 ? "..." : "")
-          : "Konsultasi Gambar";
-      const { data } = await supabase
-        .from('chats')
-        .insert({ user_id: user.id, title })
-        .select()
-        .single();
-
-      if (data) {
-        currentChatId = data.id;
-        setActiveChatId(data.id);
-        activeChatIdRef.current = data.id;
-      }
-    }
-
-    // Simpan pesan user ke database
-    if (currentChatId && user && content) {
-      await supabase.from('messages').insert({
-        chat_id: currentChatId,
-        role: 'user',
-        content: content + (files?.length ? ' [Mengirim lampiran gambar]' : ''),
-      });
+      const chat = await createChat(displayText);
+      currentChatId = chat.id;
+      setActiveChatId(chat.id);
+      activeChatIdRef.current = chat.id;
+      setChatListVersion((value) => value + 1);
     }
 
     // ─── Kirim ke AI SDK menggunakan sendMessage ───────────────────────────
     // API yang benar untuk @ai-sdk/react v3.x + ai v6.x
-    sendMessage({ text: content || "Tolong analisis dokumen/gambar ini." });
+    await sendMessage(
+      { text: displayText },
+      { body: { chatId: currentChatId, attachments: attachments || [] } }
+    );
     // ──────────────────────────────────────────────────────────────────────
   };
 
@@ -229,6 +161,7 @@ export default function ChatInterface({ user }: { user: User | null }) {
         onSelectChat={loadChat}
         onPromptClick={handleSend}
         user={user}
+        refreshKey={chatListVersion}
       />
 
       {/* Main content */}

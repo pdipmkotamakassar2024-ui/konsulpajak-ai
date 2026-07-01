@@ -64,7 +64,7 @@ export default function AdminDashboard() {
 
   if (isAuthenticated === null) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", fontFamily: "Inter, sans-serif" }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", fontFamily: "var(--font-inter), sans-serif" }}>
         <p style={{ color: "#6B7280" }}>Memeriksa otentikasi admin...</p>
       </div>
     );
@@ -72,7 +72,7 @@ export default function AdminDashboard() {
 
   if (isAuthenticated === false) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", fontFamily: "Inter, sans-serif" }}>
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", fontFamily: "var(--font-inter), sans-serif" }}>
         <div style={{ background: "white", padding: "40px", borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.05)", width: "100%", maxWidth: "400px", textAlign: "center" }}>
           <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#991B1B", marginBottom: "16px" }}>Akses Ditolak</h1>
           <p style={{ color: "#374151", marginBottom: "24px" }}>{errorMessage}</p>
@@ -85,7 +85,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "#F8FAFC", fontFamily: "Inter, sans-serif", padding: "40px 20px" }}>
+    <div style={{ minHeight: "100vh", background: "#F8FAFC", fontFamily: "var(--font-inter), sans-serif", padding: "40px 20px" }}>
       <div style={{ maxWidth: "800px", margin: "0 auto" }}>
         <h1 style={{ fontSize: "28px", fontWeight: 700, color: "#0B1B3B", marginBottom: "32px" }}>Dashboard Admin</h1>
 
