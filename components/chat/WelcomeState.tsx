@@ -30,11 +30,7 @@ export const suggestions = [
   },
 ];
 
-interface WelcomeStateProps {
-  onPromptClick: (prompt: string) => void;
-}
-
-export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
+export default function WelcomeState() {
   return (
     <div
       className="welcome-container"
@@ -44,8 +40,8 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "70vh",
-        paddingTop: 0,
+        minHeight: "100%",
+        padding: "24px 28px",
         position: "relative",
         overflow: "hidden",
       }}
@@ -276,21 +272,6 @@ export default function WelcomeState({ onPromptClick }: WelcomeStateProps) {
       >
         Asisten Konsultan Pajak Coretax Anda.
       </p>
-
-      <div className="suggestions-grid animate-fade-up-3" style={{ position: "relative", zIndex: 1, maxWidth: "720px" }}>
-        {suggestions.map((item) => (
-          <button
-            key={item.title}
-            type="button"
-            className="suggestion-card"
-            onClick={() => onPromptClick(item.prompt)}
-          >
-            <span className="suggestion-icon">{item.icon}</span>
-            <span className="suggestion-title">{item.title}</span>
-            <span className="suggestion-desc">{item.desc}</span>
-          </button>
-        ))}
-      </div>
 
       {/* ===== Wave SVG di bagian bawah container ===== */}
       <div

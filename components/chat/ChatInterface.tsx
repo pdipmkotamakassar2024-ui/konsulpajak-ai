@@ -178,7 +178,7 @@ export default function ChatInterface({ user }: { user: User | null }) {
         {/* Scrollable chat area */}
         <div className="chat-scroll-area">
           {messages.length === 0 ? (
-            <WelcomeState onPromptClick={handleSend} />
+            <WelcomeState />
           ) : (
             <MessageList messages={messages} isTyping={isLoading} />
           )}
