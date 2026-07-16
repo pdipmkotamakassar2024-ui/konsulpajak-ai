@@ -1,8 +1,9 @@
 import type { ChatAttachment } from "./types";
 
 export const MAX_ATTACHMENTS = 3;
-export const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
-export const MAX_PDF_BYTES = 10 * 1024 * 1024;
+export const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
+export const MAX_PDF_BYTES = 3 * 1024 * 1024;
+export const MAX_TOTAL_ATTACHMENT_BYTES = 3 * 1024 * 1024;
 
 export const ALLOWED_ATTACHMENT_TYPES = [
   "image/jpeg",
@@ -33,6 +34,11 @@ export function validateAttachmentList(files: Array<Pick<ChatAttachment, "name" 
   for (const file of files) {
     const error = validateAttachmentMeta(file);
     if (error) return error;
+  }
+
+  const totalSize = files.reduce((total, file) => total + file.size, 0);
+  if (totalSize > MAX_TOTAL_ATTACHMENT_BYTES) {
+    return "Total lampiran terlalu besar. Batas total 3 MB per pesan.";
   }
 
   return null;

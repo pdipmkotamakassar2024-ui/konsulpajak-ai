@@ -4,7 +4,7 @@ import { createAdminClient } from "@/utils/supabase/admin";
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
   });
 }
 
@@ -29,7 +29,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     .maybeSingle();
 
   if (chatError) {
-    return json({ error: chatError.message }, 500);
+    console.error("chat_owner_lookup_failed", chatError);
+    return json({ error: "Chat could not be loaded" }, 500);
   }
 
   if (!chat) {
@@ -43,7 +44,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     .order("created_at", { ascending: true });
 
   if (messageError) {
-    return json({ error: messageError.message }, 500);
+    console.error("message_list_failed", messageError);
+    return json({ error: "Messages could not be loaded" }, 500);
   }
 
   return json({ data: data ?? [] });

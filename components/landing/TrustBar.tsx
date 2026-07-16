@@ -8,8 +8,8 @@ const stats = [
         <polyline points="14 2 14 8 20 8" />
       </svg>
     ),
-    value: ">10.000",
-    label: "Peraturan DJP & Kemenkeu",
+    value: "Resmi",
+    label: "Sumber DJP & JDIH",
   },
   {
     icon: (
@@ -18,8 +18,8 @@ const stats = [
         <path d="M7 11V7a5 5 0 0 1 10 0v4" />
       </svg>
     ),
-    value: "AES-256",
-    label: "Enkripsi Data Dokumen",
+    value: "TLS",
+    label: "Koneksi HTTPS",
   },
   {
     icon: (
@@ -27,8 +27,8 @@ const stats = [
         <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
       </svg>
     ),
-    value: "99.9%",
-    label: "Akurasi Referensi Hukum",
+    value: "Bertanggal",
+    label: "Knowledge Base Terkurasi",
   },
   {
     icon: (
@@ -37,13 +37,13 @@ const stats = [
         <polyline points="12 6 12 12 16 14" />
       </svg>
     ),
-    value: "<3 Detik",
-    label: "Rata-rata Waktu Jawaban",
+    value: "Coretax",
+    label: "Panduan Tahun Pajak 2025+",
   },
 ];
 
 const badges = [
-  { icon: "🏛️", text: "Database Resmi DJP" },
+  { icon: "🏛️", text: "Sumber Resmi DJP & JDIH" },
   { icon: "🔐", text: "SSL Terenkripsi" },
   { icon: "🤖", text: "Powered by Google Gemini" },
   { icon: "🇮🇩", text: "Hukum Pajak Indonesia" },

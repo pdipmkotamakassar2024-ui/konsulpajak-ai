@@ -39,12 +39,12 @@ const features = [
     ),
     title: "Kalkulator Pajak Otomatis",
     description:
-      "Input penghasilan, sistem langsung hitung pajak terutang secara akurat. Mendukung PPh 21 karyawan, PPh Badan, PPN, dan pajak UMKM tarif 0,5%.",
+      "Masukkan penghasilan untuk mendapat estimasi PPh 21 pegawai, bukan pegawai, dan penghasilan final tertentu berdasarkan parameter yang tersedia.",
     points: [
-      "PPh 21 karyawan & freelancer",
-      "Pajak UMKM (PP 55/2022)",
-      "PPN & PPnBM",
-      "Ekspor ringkasan PDF",
+      "PPh 21 bulanan dengan TER",
+      "Rekonsiliasi PPh 21 tahunan",
+      "Pesangon dan honorarium tertentu",
+      "Estimasi disertai dasar perhitungan",
     ],
     color: "#00BFFF",
   },
@@ -66,7 +66,7 @@ const features = [
       "SPT Tahunan Orang Pribadi",
       "SPT Tahunan Badan (PPh 25/29)",
       "Checklist dokumen persyaratan",
-      "Integrasi dengan sistem e-Filing DJP",
+      "Alur Coretax untuk Tahun Pajak 2025+",
     ],
     color: "#1E90FF",
   },
@@ -237,9 +237,9 @@ export default function FeaturesSection() {
               Cara Kerja
             </div>
             <HowItWorksStep number="1" title="Ketik pertanyaan Anda" desc="Tanya dalam bahasa sehari-hari, AI akan memahami konteks pertanyaan pajak Anda." />
-            <HowItWorksStep number="2" title="AI mencari aturan relevan" desc="Sistem RAG mencari ribuan dokumen hukum pajak untuk menemukan aturan yang tepat." />
-            <HowItWorksStep number="3" title="Jawaban terverifikasi" desc="Gemini menyusun jawaban berdasarkan hukum nyata, lengkap dengan nomor pasal dan peraturan." />
-            <HowItWorksStep number="4" title="Referensi bisa diklik" desc="Setiap jawaban dilengkapi link ke dokumen asli DJP untuk verifikasi mandiri." />
+            <HowItWorksStep number="2" title="Topik dicocokkan" desc="Pertanyaan dicocokkan dengan knowledge base regulasi terkurasi yang relevan." />
+            <HowItWorksStep number="3" title="Jawaban disusun" desc="AI menyusun penjelasan praktis dari konteks regulasi resmi yang tersedia." />
+            <HowItWorksStep number="4" title="Sumber dapat diperiksa" desc="Untuk topik yang tersedia, jawaban menyertakan tautan DJP atau JDIH untuk verifikasi mandiri." />
           </div>
         </div>
 
@@ -253,9 +253,9 @@ export default function FeaturesSection() {
           className="features-mini-grid"
         >
           {[
-            { icon: "📤", title: "Upload Dokumen", desc: "PDF, foto nota, Excel laporan keuangan langsung dianalisis AI" },
-            { icon: "📖", title: "Referensi Hukum", desc: "Setiap jawaban disertai sumber peraturan yang bisa dibuka" },
-            { icon: "🔔", title: "Reminder Deadline", desc: "Notifikasi otomatis sebelum tenggat waktu pajak tiba" },
+            { icon: "📤", title: "Upload Dokumen", desc: "PDF teks serta gambar JPG, PNG, atau WebP dapat dianalisis AI" },
+            { icon: "📖", title: "Referensi Hukum", desc: "Topik terkurasi menyertakan sumber DJP atau JDIH yang bisa dibuka" },
+            { icon: "🧮", title: "Kalkulator PPh 21", desc: "Estimasi TER bulanan, rekonsiliasi tahunan, dan kategori tertentu" },
           ].map((item) => (
             <div
               key={item.title}

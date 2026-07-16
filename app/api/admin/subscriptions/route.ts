@@ -1,7 +1,6 @@
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
-
-const ADMIN_EMAILS = ['pdipmkotamakassar2024@gmail.com', 'ziqranraihan@gmail.com'];
+import { isAdminEmail } from '@/lib/auth/admin';
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -15,7 +14,7 @@ export async function POST(req: Request) {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user || !user.email || !ADMIN_EMAILS.includes(user.email)) {
+    if (authError || !user || !isAdminEmail(user.email)) {
       return json({ error: "Unauthorized: Admin access required" }, 401);
     }
 
@@ -40,18 +39,20 @@ export async function POST(req: Request) {
     const { data, error } = await admin
       .from('subscriptions')
       .upsert(
-        { email, plan_type, expires_at: expiresAt.toISOString(), updated_at: new Date().toISOString() },
+        { email: String(email).trim().toLowerCase(), plan_type, expires_at: expiresAt.toISOString(), updated_at: new Date().toISOString() },
         { onConflict: 'email' }
       )
       .select();
 
     if (error) {
-      return json({ error: error.message }, 500);
+      console.error("subscription_upsert_failed", error);
+      return json({ error: "Subscription could not be saved" }, 500);
     }
 
     return json({ success: true, data });
-  } catch (err: any) {
-    return json({ error: err.message }, 500);
+  } catch (err) {
+    console.error("subscription_post_failed", err);
+    return json({ error: "Unexpected server error" }, 500);
   }
 }
 
@@ -60,7 +61,7 @@ export async function GET() {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user || !user.email || !ADMIN_EMAILS.includes(user.email)) {
+    if (authError || !user || !isAdminEmail(user.email)) {
       return json({ error: "Unauthorized: Admin access required" }, 401);
     }
 
@@ -71,11 +72,13 @@ export async function GET() {
       .order('expires_at', { ascending: false });
 
     if (error) {
-      return json({ error: error.message }, 500);
+      console.error("subscription_list_failed", error);
+      return json({ error: "Subscriptions could not be loaded" }, 500);
     }
 
     return json({ success: true, data });
-  } catch (err: any) {
-    return json({ error: err.message }, 500);
+  } catch (err) {
+    console.error("subscription_get_failed", err);
+    return json({ error: "Unexpected server error" }, 500);
   }
 }

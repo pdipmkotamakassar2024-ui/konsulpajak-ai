@@ -67,7 +67,7 @@ const ChatMockup = () => (
           <span className="badge badge-green" style={{ fontSize: "10px", padding: "2px 7px" }}>● Live</span>
         </div>
         <div className="chat-bubble-ai">
-          Kabar baik! Dengan omzet <strong style={{ color: "var(--primary-light)" }}>Rp 30 juta/bulan = Rp 360 juta/tahun</strong>, Anda masih di bawah batas Rp 500 juta. Berdasarkan <strong style={{ color: "var(--primary-light)" }}>PP 55/2022</strong>, Anda dapat memanfaatkan tarif PPh Final UMKM <strong style={{ color: "var(--success)" }}>0,5%</strong> alias bebas pajak! 🎉
+          Jika Anda <strong style={{ color: "var(--primary-light)" }}>Wajib Pajak orang pribadi</strong> dengan omzet Rp360 juta setahun dan memenuhi syarat PP 20/2026, bagian omzet sampai Rp500 juta tidak dikenai PPh Final UMKM. Bentuk usaha dan jenis penghasilan tetap perlu diperiksa.
         </div>
       </div>
 
@@ -102,7 +102,7 @@ const ChatMockup = () => (
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
         <polyline points="14 2 14 8 20 8" />
       </svg>
-      <span style={{ fontSize: "12px", color: "var(--primary-light)", fontWeight: "500" }}>Sumber: PP 55/2022 · UU HPP No. 7/2021</span>
+      <span style={{ fontSize: "12px", color: "var(--primary-light)", fontWeight: "500" }}>Sumber: PP 20 Tahun 2026 · DJP</span>
     </div>
 
     {/* Input bar */}
@@ -271,7 +271,7 @@ export default function HeroSection() {
             {/* Trust indicators */}
             <div className="animate-fade-up-delay-4" style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
               {[
-                { icon: "🔒", text: "Enkripsi AES-256" },
+                { icon: "🔒", text: "Koneksi HTTPS" },
                 { icon: "✅", text: "Berbasis Aturan DJP" },
                 { icon: "⚡", text: "Jawaban Instan" },
               ].map((item) => (

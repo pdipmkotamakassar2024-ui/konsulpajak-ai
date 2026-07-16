@@ -50,7 +50,7 @@ export default function ChatInterface({ user }: { user: User | null }) {
 
   // ─── useChat dengan API yang benar untuk @ai-sdk/react v3 / ai v6 ────────
   // Versi ini menggunakan sendMessage (bukan append), dan DefaultChatTransport
-  const { messages, status, sendMessage, setMessages } = useChat({
+  const { messages, status, sendMessage, setMessages, regenerate, error, clearError } = useChat({
     transport: new TextStreamChatTransport({ api: '/api/chat' }),
     onFinish: () => {
       if (user) setChatListVersion((value) => value + 1);
@@ -146,6 +146,22 @@ export default function ChatInterface({ user }: { user: User | null }) {
     // ──────────────────────────────────────────────────────────────────────
   };
 
+  const deleteChat = async (id: string) => {
+    const response = await fetch(`/api/chats/${id}`, { method: "DELETE" });
+    if (!response.ok) {
+      window.alert("Chat gagal dihapus.");
+      return;
+    }
+    if (activeChatIdRef.current === id) handleNewChat();
+    setChatListVersion((value) => value + 1);
+  };
+
+  const handleRegenerate = async (messageId: string) => {
+    if (isLoading) return;
+    clearError();
+    await regenerate({ messageId, body: { chatId: activeChatIdRef.current, attachments: [], isRegeneration: true } });
+  };
+
   return (
     <div className="app-layout">
       {/* Background ambient orbs */}
@@ -159,6 +175,7 @@ export default function ChatInterface({ user }: { user: User | null }) {
         onClose={() => setSidebarOpen(false)}
         onNewChat={handleNewChat}
         onSelectChat={loadChat}
+        onDeleteChat={deleteChat}
         onPromptClick={handleSend}
         user={user}
         refreshKey={chatListVersion}
@@ -177,10 +194,16 @@ export default function ChatInterface({ user }: { user: User | null }) {
 
         {/* Scrollable chat area */}
         <div className="chat-scroll-area">
+          {error && (
+            <div role="alert" style={{ margin: "12px auto", maxWidth: "760px", padding: "12px 16px", borderRadius: "10px", background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.25)", color: "#dc2626", fontSize: "13px", display: "flex", justifyContent: "space-between", gap: "12px" }}>
+              <span>{error.message || "Permintaan gagal. Silakan coba kembali."}</span>
+              <button onClick={clearError} aria-label="Tutup pesan kesalahan" style={{ border: 0, background: "transparent", color: "inherit", cursor: "pointer", fontWeight: 700 }}>×</button>
+            </div>
+          )}
           {messages.length === 0 ? (
             <WelcomeState />
           ) : (
-            <MessageList messages={messages} isTyping={isLoading} />
+            <MessageList messages={messages} isTyping={isLoading} onRegenerate={handleRegenerate} />
           )}
           <div ref={messagesEndRef} />
         </div>

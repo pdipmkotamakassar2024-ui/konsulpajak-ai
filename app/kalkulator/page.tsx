@@ -10,7 +10,8 @@ import {
   GOLONGAN_PNS_OPTIONS,
   getTerCategory,
   getTerRate,
-  calcPasal17,
+  calcPph21Tahunan,
+  calcTidakFinalTax,
   formatRupiah,
 } from "@/lib/tax/pph21-data";
 
@@ -104,7 +105,6 @@ function BulananForm() {
       { label: `Kategori TER ${category}`, value: 0, note: `Tarif: ${(rate * 100).toFixed(2)}%` } as any,
       { separator: true } as any,
       { label: "PPh 21 Dipotong (Bulanan)", value: pph, highlight: true },
-      { label: "Estimasi Setahun (×12)", value: pph * 12 },
       { label: "Neto Diterima", value: brutoNum - pph },
     ]);
   }, [bruto, ptkp]);
@@ -128,7 +128,7 @@ function BulananForm() {
               : <ResultRow key={i} item={r} />
           )}
           <div className="kalk-disclaimer">
-            Dihitung berdasarkan PP No. 58 Tahun 2023 (Tarif Efektif Rata-rata / TER)
+            TER dipakai untuk masa selain masa pajak terakhir. Masa pajak terakhir dihitung ulang secara tahunan sesuai PMK 168/2023; hasil bulanan tidak boleh sekadar dikali 12.
           </div>
         </div>
       )}
@@ -156,30 +156,19 @@ function TahunanForm() {
     const pensiun = n(iuranPensiun);
     const bulanNum = parseInt(bulan) || 12;
 
-    const totalBruto = (gajiNum + tunjanganNum) * bulanNum + bonusNum;
-
-    // Biaya Jabatan: 5% dari bruto, max 500.000/bulan = 6.000.000/tahun
-    const biayaJabatan = Math.min(totalBruto * 0.05, 6_000_000);
-    const totalPengurang = biayaJabatan + pensiun;
-    const neto = totalBruto - totalPengurang;
-    const pkp = Math.max(0, neto - PTKP[ptkp]);
-
-    // Round PKP to nearest thousand (Pembulatan ribuan ke bawah)
-    const pkpRounded = Math.floor(pkp / 1000) * 1000;
-    const pphTerutang = calcPasal17(pkpRounded);
+    const annual = calcPph21Tahunan({ monthlySalary: gajiNum, monthlyAllowance: tunjanganNum, annualBonus: bonusNum, employeePensionContribution: pensiun, months: bulanNum, ptkpStatus: ptkp });
 
     setResults([
-      { label: `Total Penghasilan Bruto (${bulanNum} bln)`, value: totalBruto },
-      { label: "Biaya Jabatan (maks Rp 6 jt/thn)", value: -biayaJabatan },
+      { label: `Total Penghasilan Bruto (${annual.months} bln)`, value: annual.bruto },
+      { label: `Biaya Jabatan (maks Rp 500 rb × ${annual.months} bln)`, value: -annual.biayaJabatan },
       { label: "Iuran Pensiun (dibayar sendiri)", value: -pensiun },
       { separator: true } as any,
-      { label: "Penghasilan Neto", value: neto },
+      { label: "Penghasilan Neto", value: annual.neto },
       { label: `PTKP (${ptkp})`, value: -PTKP[ptkp] },
       { separator: true } as any,
-      { label: "PKP (Penghasilan Kena Pajak)", value: pkpRounded },
+      { label: "PKP (Penghasilan Kena Pajak)", value: annual.pkp },
       { separator: true } as any,
-      { label: "PPh 21 Terutang Setahun", value: pphTerutang, highlight: true },
-      { label: `PPh 21 Per Bulan (÷${bulanNum})`, value: Math.round(pphTerutang / bulanNum) },
+      { label: "PPh 21 Terutang untuk Rekonsiliasi", value: annual.tax, highlight: true },
     ]);
   }, [gaji, tunjangan, bonus, iuranPensiun, ptkp, bulan]);
 
@@ -240,7 +229,7 @@ function FinalForm() {
 
   return (
     <div className="kalk-form">
-      <SelectField label="Kode Objek Pajak (KOP)"
+      <SelectField label="Jenis Penghasilan (kode bukti potong)"
         options={Object.entries(FINAL_KOP).map(([k, v]) => ({ value: k, label: `${k} — ${v.label}` }))}
         value={kopKey} onChange={setKopKey} />
       <InputField label="Penghasilan Bruto" value={bruto} onChange={setBruto} />
@@ -255,7 +244,7 @@ function FinalForm() {
         <div className="kalk-results">
           <div className="kalk-results-title">Hasil Perhitungan PPh 21 Final</div>
           {results.map((r, i) => r.separator ? <div key={i} className="kalk-result-separator" /> : <ResultRow key={i} item={r} />)}
-          <div className="kalk-disclaimer">PPh Final bersifat TUNTAS — tidak diperhitungkan dalam SPT Tahunan</div>
+          <div className="kalk-disclaimer">Penghasilan dan PPh Final tetap dilaporkan dalam SPT Tahunan, tetapi PPh Final tidak menjadi kredit pajak terhadap PPh nonfinal.</div>
         </div>
       )}
     </div>
@@ -274,24 +263,22 @@ function TidakFinalForm() {
 
   const calculate = useCallback(() => {
     const brutoNum = parseFloat(bruto.replace(/[^0-9]/g, "")) || 0;
-    const dpp = Math.round(brutoNum * kop.dppFactor);
-    const pkp = Math.max(0, Math.floor(dpp / 1000) * 1000);
-    const pph = calcPasal17(pkp);
+    const calculation = calcTidakFinalTax(brutoNum, kop.dppFactor);
 
     setResults([
       { label: "Penghasilan Bruto", value: brutoNum },
-      { label: `DPP (${kop.dppFactor * 100}% dari Bruto)`, value: dpp },
+      { label: `DPP (${kop.dppFactor * 100}% dari Bruto)`, value: calculation.dpp },
       { separator: true } as any,
-      { label: "PKP (Penghasilan Kena Pajak)", value: pkp },
+      { label: "DPP Dibulatkan", value: calculation.roundedDpp },
       { separator: true } as any,
-      { label: "PPh 21 Terutang (Pasal 17)", value: pph, highlight: true },
-      { label: "Neto Diterima", value: brutoNum - pph },
+      { label: "PPh 21 Terutang (Pasal 17)", value: calculation.tax, highlight: true },
+      { label: "Neto Diterima", value: brutoNum - calculation.tax },
     ]);
   }, [bruto, kop]);
 
   return (
     <div className="kalk-form">
-      <SelectField label="Kode Objek Pajak / Jenis Penerima"
+      <SelectField label="Jenis Penerima Penghasilan"
         options={Object.entries(TIDAK_FINAL_KOP).map(([k, v]) => ({ value: k, label: v.label }))}
         value={kopKey} onChange={setKopKey} />
       <div className="kalk-info-card">
@@ -317,8 +304,8 @@ function TidakFinalForm() {
 const TABS: { key: PemotonganType; label: string; icon: string; desc: string }[] = [
   { key: "bulanan", label: "PPh 21 Bulanan", icon: "📅", desc: "Pegawai Tetap (TER)" },
   { key: "tahunan", label: "PPh 21 Tahunan", icon: "📊", desc: "Rekap A1 / A2" },
-  { key: "final", label: "PPh 21 Final", icon: "✅", desc: "PNS, Pesangon" },
-  { key: "tidak_final", label: "PPh 21 Tdk Final", icon: "🔄", desc: "Tenaga Ahli, Komisaris" },
+  { key: "final", label: "PPh 21 Final", icon: "✅", desc: "Honor tertentu, pesangon" },
+  { key: "tidak_final", label: "PPh 21 Tdk Final", icon: "🔄", desc: "Tenaga ahli, peserta" },
 ];
 
 export default function KalkulatorPage() {

@@ -177,8 +177,8 @@ export interface FinalTaxParam {
 }
 
 export const FINAL_KOP: Record<string, FinalTaxParam> = {
-  "21-401-07": {
-    label: "Honor PNS dari APBN/APBD",
+  "21-402-01": {
+    label: "Honorarium APBN/APBD untuk PNS/TNI/Polri/Pejabat Negara/Pensiunan",
     needsGolongan: true,
     calculate: (bruto, golongan) => {
       if (!golongan) return 0;
@@ -187,25 +187,13 @@ export const FINAL_KOP: Record<string, FinalTaxParam> = {
       return bruto * tarif;
     }
   },
-  "21-402-01": {
+  "21-401-01": {
     label: "Pesangon (Sekaligus)",
-    calculate: (bruto) => {
-      // Tarif berjenjang pesangon
-      let tax = 0;
-      if (bruto > 500_000_000) {
-        tax += (bruto - 500_000_000) * 0.25; bruto = 500_000_000;
-      }
-      if (bruto > 100_000_000) {
-        tax += (bruto - 100_000_000) * 0.15; bruto = 100_000_000;
-      }
-      if (bruto > 50_000_000) {
-        tax += (bruto - 50_000_000) * 0.10; bruto = 50_000_000;
-      }
-      if (bruto > 0) {
-        tax += bruto * 0;
-      }
-      return tax;
-    }
+    calculate: (bruto) => calcPesangonTax(bruto),
+  },
+  "21-401-02": {
+    label: "Uang Manfaat Pensiun/THT/JHT Dibayar Sekaligus",
+    calculate: (bruto) => Math.max(0, bruto - 50_000_000) * 0.05,
   },
 };
 
@@ -215,12 +203,9 @@ export interface TidakFinalParam {
 }
 
 export const TIDAK_FINAL_KOP: Record<string, TidakFinalParam> = {
-  "21-100-01": { label: "Tenaga Ahli (Konsultan, Dokter, dll)", dppFactor: 0.5 },
-  "21-100-02": { label: "Agen Asuransi / Distributor MLM", dppFactor: 0.5 },
-  "21-100-03": { label: "Penjaja Barang Dagangan", dppFactor: 0.5 },
-  "21-100-04": { label: "Anggota Dewan Komisaris (Bukan Pegawai)", dppFactor: 1 },
-  "21-100-05": { label: "Mantan Pegawai (Jasa Produksi/Bonus)", dppFactor: 1 },
-  "21-100-06": { label: "Peserta Kegiatan/Lomba", dppFactor: 1 },
+  "21-100-07": { label: "Tenaga Ahli yang Melakukan Pekerjaan Bebas", dppFactor: 0.5 },
+  "21-100-09": { label: "Bukan Pegawai Selain Tenaga Ahli", dppFactor: 0.5 },
+  "21-100-13": { label: "Peserta Kegiatan", dppFactor: 1 },
 };
 
 // Golongan PNS for dropdown
@@ -273,6 +258,45 @@ export function calcPasal17(pkp: number): number {
     prevMax = max;
   }
   return Math.max(0, Math.floor(tax));
+}
+
+/** Biaya jabatan 5% dengan batas Rp500 ribu untuk setiap bulan bekerja. */
+export function calcBiayaJabatan(bruto: number, months: number) {
+  const boundedMonths = Math.min(12, Math.max(1, Math.floor(months)));
+  return Math.min(Math.max(0, bruto) * 0.05, 500_000 * boundedMonths);
+}
+
+/** PPh 21 setahun/masa terakhir; TER bulanan sebelumnya menjadi kredit pemotongan. */
+export function calcPph21Tahunan(params: {
+  monthlySalary: number;
+  monthlyAllowance: number;
+  annualBonus: number;
+  employeePensionContribution: number;
+  months: number;
+  ptkpStatus: string;
+}) {
+  const months = Math.min(12, Math.max(1, Math.floor(params.months)));
+  const bruto = (Math.max(0, params.monthlySalary) + Math.max(0, params.monthlyAllowance)) * months + Math.max(0, params.annualBonus);
+  const biayaJabatan = calcBiayaJabatan(bruto, months);
+  const neto = Math.max(0, bruto - biayaJabatan - Math.max(0, params.employeePensionContribution));
+  const pkp = Math.floor(Math.max(0, neto - (PTKP[params.ptkpStatus] ?? 0)) / 1_000) * 1_000;
+  return { months, bruto, biayaJabatan, neto, pkp, tax: calcPasal17(pkp) };
+}
+
+/** Tarif final progresif untuk pesangon yang dibayar sekaligus (PP 68/2009). */
+export function calcPesangonTax(bruto: number) {
+  const value = Math.max(0, bruto);
+  return Math.floor(
+    Math.min(Math.max(value - 50_000_000, 0), 50_000_000) * 0.05 +
+    Math.min(Math.max(value - 100_000_000, 0), 400_000_000) * 0.15 +
+    Math.max(value - 500_000_000, 0) * 0.25
+  );
+}
+
+export function calcTidakFinalTax(bruto: number, dppFactor: 0.5 | 1) {
+  const dpp = Math.max(0, bruto) * dppFactor;
+  const roundedDpp = Math.floor(dpp / 1_000) * 1_000;
+  return { dpp, roundedDpp, tax: calcPasal17(roundedDpp) };
 }
 
 /** Format number as Indonesian Rupiah */

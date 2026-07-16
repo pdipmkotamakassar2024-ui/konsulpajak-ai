@@ -9,8 +9,9 @@ Set these in Vercel Project Settings > Environment Variables:
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` (server-only, never expose to browser)
 - `GOOGLE_GENERATIVE_AI_API_KEY` (rotated key only)
+- `ADMIN_EMAILS` (comma-separated, server-only)
 
-Apply `supabase/migrations/202606300001_harden_chat_schema.sql` in Supabase before deploying the API changes.
+Apply every file in `supabase/migrations/` in filename order before deploying API changes. The 15 July 2026 migration adds validated constraints and the atomic `consume_chat_quota` RPC required by `/api/chat`.
 
 ## Secret Rotation
 
@@ -20,6 +21,11 @@ The previous Gemini key was committed in a test file. Treat it as compromised:
 2. Create a new Gemini API key.
 3. Put the new key in Vercel and local `.env.local`.
 4. Force redeploy Vercel after updating the variable.
+5. Remove the leaked value from open issues, logs, or screenshots after rotation; history must still be treated as compromised.
+
+## Release Gate
+
+Run `npm test`, `npm run lint`, `npm run typecheck`, and `npm run build`. Protect `main` and require the GitHub Actions CI check before merging.
 
 ## Domain Setup
 

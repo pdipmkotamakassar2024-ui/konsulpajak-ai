@@ -134,9 +134,28 @@ function getMessageText(msg: any): string {
 interface MessageListProps {
   messages: any[];
   isTyping: boolean;
+  onRegenerate?: (messageId: string) => void | Promise<void>;
 }
 
-export default function MessageList({ messages, isTyping }: MessageListProps) {
+export default function MessageList({ messages, isTyping, onRegenerate }: MessageListProps) {
+  const [copiedId, setCopiedId] = React.useState<string | null>(null);
+  const [likedIds, setLikedIds] = React.useState<Set<string>>(new Set());
+  const lastAssistantId = messages.findLast((message) => message.role === "assistant")?.id;
+
+  const copyAnswer = async (id: string, text: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    window.setTimeout(() => setCopiedId((current) => current === id ? null : current), 1500);
+  };
+
+  const toggleLike = (id: string) => {
+    setLikedIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
   return (
     <div className="messages-container">
       {messages.map((msg) => (
@@ -202,27 +221,29 @@ export default function MessageList({ messages, isTyping }: MessageListProps) {
 
                 {/* Message actions */}
                 <div className="message-actions">
-                  <button className="msg-action-btn" title="Salin jawaban" aria-label="Salin jawaban">
+                  <button className="msg-action-btn" title="Salin jawaban" aria-label="Salin jawaban" onClick={() => copyAnswer(msg.id, getMessageText(msg))}>
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
                       <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
                     </svg>
-                    Salin
+                    {copiedId === msg.id ? "Tersalin" : "Salin"}
                   </button>
-                  <button className="msg-action-btn" title="Beri penilaian bagus" aria-label="Jawaban bagus">
+                  <button className="msg-action-btn" title="Beri penilaian bagus" aria-label="Jawaban bagus" aria-pressed={likedIds.has(msg.id)} onClick={() => toggleLike(msg.id)} style={likedIds.has(msg.id) ? { color: "var(--primary)" } : undefined}>
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z" />
                       <path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
                     </svg>
-                    Bagus
+                    {likedIds.has(msg.id) ? "Disukai" : "Bagus"}
                   </button>
-                  <button className="msg-action-btn" title="Ulangi jawaban" aria-label="Ulangi jawaban">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="1 4 1 10 7 10" />
-                      <path d="M3.51 15a9 9 0 1 0 .49-4.39" />
-                    </svg>
-                    Ulangi
-                  </button>
+                  {msg.id === lastAssistantId && (
+                    <button className="msg-action-btn" title="Ulangi jawaban" aria-label="Ulangi jawaban" disabled={isTyping} onClick={() => onRegenerate?.(msg.id)}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="1 4 1 10 7 10" />
+                        <path d="M3.51 15a9 9 0 1 0 .49-4.39" />
+                      </svg>
+                      Ulangi
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

@@ -48,12 +48,13 @@ interface SidebarProps {
   onClose: () => void;
   onNewChat: () => void;
   onSelectChat?: (id: string) => void;
+  onDeleteChat?: (id: string) => void | Promise<void>;
   onPromptClick?: (prompt: string) => void;
   user?: User | null;
   refreshKey?: number;
 }
 
-export default function Sidebar({ isOpen, onClose, onNewChat, onSelectChat, onPromptClick, user, refreshKey = 0 }: SidebarProps) {
+export default function Sidebar({ isOpen, onClose, onNewChat, onSelectChat, onDeleteChat, onPromptClick, user, refreshKey = 0 }: SidebarProps) {
   const [recentChats, setRecentChats] = useState<ChatSummary[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -184,6 +185,15 @@ export default function Sidebar({ isOpen, onClose, onNewChat, onSelectChat, onPr
               <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                 {chat.title}
               </span>
+              <button
+                aria-label={`Hapus chat ${chat.title}`}
+                title="Hapus chat"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  if (window.confirm("Hapus chat ini beserta seluruh pesannya?")) onDeleteChat?.(chat.id);
+                }}
+                style={{ marginLeft: "auto", border: 0, background: "transparent", color: "var(--text-faint)", cursor: "pointer", padding: "2px 4px" }}
+              >×</button>
             </div>
           ))}
 

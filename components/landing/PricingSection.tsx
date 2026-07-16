@@ -14,14 +14,11 @@ const plans = [
     ctaHref: "/auth/register",
     popular: false,
     features: [
-      { text: "10 pertanyaan per hari", included: true },
-      { text: "Referensi hukum pajak", included: true },
-      { text: "Kalkulator pajak dasar", included: true },
-      { text: "Riwayat chat 7 hari", included: true },
-      { text: "Upload dokumen", included: false },
-      { text: "Template SP2DK", included: false },
-      { text: "Ekspor PDF", included: false },
-      { text: "Priority support", included: false },
+      { text: "5 pertanyaan per 24 jam", included: true },
+      { text: "Sumber resmi untuk topik terkurasi", included: true },
+      { text: "Kalkulator PPh 21", included: true },
+      { text: "Riwayat tersimpan untuk akun login", included: true },
+      { text: "Upload gambar/PDF dalam batas ukuran", included: true },
     ],
   },
   {
@@ -36,13 +33,10 @@ const plans = [
     popular: true,
     features: [
       { text: "Pertanyaan unlimited", included: true },
-      { text: "Referensi hukum pajak", included: true },
-      { text: "Kalkulator pajak lengkap", included: true },
-      { text: "Riwayat chat unlimited", included: true },
-      { text: "Upload 5 dokumen/bulan", included: true },
-      { text: "Template SP2DK", included: true },
-      { text: "Ekspor PDF", included: false },
-      { text: "Priority support", included: false },
+      { text: "Sumber resmi untuk topik terkurasi", included: true },
+      { text: "Kalkulator PPh 21", included: true },
+      { text: "Riwayat konsultasi tersimpan", included: true },
+      { text: "Upload gambar/PDF dalam batas ukuran", included: true },
     ],
   },
   {
@@ -57,13 +51,10 @@ const plans = [
     popular: false,
     features: [
       { text: "Pertanyaan unlimited", included: true },
-      { text: "Referensi hukum pajak", included: true },
-      { text: "Kalkulator pajak lengkap", included: true },
-      { text: "Riwayat chat unlimited", included: true },
-      { text: "Upload dokumen unlimited", included: true },
-      { text: "Template SP2DK", included: true },
-      { text: "Ekspor PDF", included: true },
-      { text: "Priority support", included: true },
+      { text: "Sumber resmi untuk topik terkurasi", included: true },
+      { text: "Kalkulator PPh 21", included: true },
+      { text: "Riwayat konsultasi tersimpan", included: true },
+      { text: "Upload gambar/PDF dalam batas ukuran", included: true },
     ],
   },
 ];
@@ -246,7 +237,7 @@ export default function PricingSection() {
 
         {/* Bottom note */}
         <p style={{ textAlign: "center", fontSize: "13px", color: "var(--text-faint)", marginTop: "40px" }}>
-          Semua paket sudah termasuk akses ke database peraturan pajak yang selalu diperbarui. <br />
+          Knowledge base terkurasi terakhir ditinjau 15 Juli 2026; perubahan regulasi setelah tanggal itu perlu diverifikasi. <br />
           Butuh paket khusus untuk perusahaan?{" "}
           <Link href="/kontak" style={{ color: "var(--primary-light)", textDecoration: "none", fontWeight: "500" }}>
             Hubungi tim kami →

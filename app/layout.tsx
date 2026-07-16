@@ -1,25 +1,13 @@
 import type { Metadata } from "next";
-import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://konsulpajak-ai.com";
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-const poppins = Poppins({
-  subsets: ["latin"],
-  variable: "--font-poppins",
-  display: "swap",
-  weight: ["400", "600", "700", "800", "900"],
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "KonsulPajak AI — Konsultan Pajak Pribadi untuk UMKM & Profesional",
   description:
-    "Konsultasi pajak Indonesia berbasis AI. Hitung pajak, pahami aturan DJP, dan lapor SPT dengan mudah. Didukung database >10.000 peraturan pajak resmi.",
+    "Konsultasi pajak Indonesia berbasis AI dengan knowledge base regulasi terkurasi, kalkulator PPh 21, dan panduan Coretax.",
   keywords: [
     "konsultan pajak",
     "pajak UMKM",
@@ -64,7 +52,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${inter.variable} ${poppins.variable}`} suppressHydrationWarning>
+    <html lang="id" suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );

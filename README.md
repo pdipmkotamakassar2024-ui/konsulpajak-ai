@@ -1,36 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KonsulPajak AI
 
-## Getting Started
+Aplikasi konsultasi pajak Indonesia berbasis Next.js, Google Gemini, dan Supabase. Fitur yang tersedia meliputi chat streaming, riwayat untuk pengguna login, analisis gambar/PDF, kuota gratis, langganan manual, kalkulator PPh 21, dan knowledge base regulasi resmi bertanggal.
 
-First, run the development server:
+## Menjalankan secara lokal
+
+Persyaratan: Node.js 20+ dan proyek Supabase.
 
 ```bash
+npm ci
+copy .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Isi seluruh variabel pada `.env.local`. Jangan pernah memasukkan service-role key atau Gemini API key ke source control maupun variabel `NEXT_PUBLIC_*`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Verifikasi
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm test
+npm run lint
+npm run typecheck
+npm run build
+```
 
-## Learn More
+CI menjalankan empat pemeriksaan tersebut pada setiap pull request dan push ke `main`.
 
-To learn more about Next.js, take a look at the following resources:
+## Database
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Jalankan migrasi berurutan:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. `supabase/migrations/202606300001_harden_chat_schema.sql`
+2. `supabase/migrations/202607150001_atomic_quota_and_constraints.sql`
 
-## Deploy on Vercel
+Migrasi kedua meretrofit constraint pada instalasi lama dan menyediakan RPC kuota atomik. API chat memerlukan `SUPABASE_SERVICE_ROLE_KEY`; jangan beri klien akses langsung ke `subscriptions` atau `usage_events`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Knowledge base regulasi
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Fakta terkurasi berada di `lib/ai/regulatory-knowledge.ts` dan mencantumkan tanggal peninjauan serta sumber resmi DJP/JDIH. Tambahkan atau ubah entri hanya setelah memeriksa sumber primer, lalu perbarui test retrieval. Knowledge base bukan crawler otomatis; perubahan setelah tanggal peninjauan harus diverifikasi kembali.
+
+## Batas lampiran dan chat
+
+- Maksimal 3 lampiran dan total 3 MB per pesan.
+- Gambar: JPG, PNG, WebP, maksimal 2 MB per file.
+- PDF: maksimal 3 MB dan harus memiliki teks yang dapat diekstrak.
+- Pesan: maksimal 8.000 karakter per pesan dan 40.000 karakter untuk riwayat request.
+- Paket gratis: 5 permintaan dalam jendela 24 jam.
+
+## Keamanan operasional
+
+- Rotasi segera setiap secret yang pernah tampil di commit, issue, log, atau tangkapan layar.
+- Lindungi branch `main`, wajibkan CI, aktifkan Dependabot/secret scanning, dan batasi akses Supabase service role.
+- Tinjau kebijakan retensi Google Gemini dan Supabase sesuai akun produksi.
+- Terapkan migrasi sebelum men-deploy kode API baru.
+
+Detail produksi ada di [DEPLOYMENT.md](./DEPLOYMENT.md).

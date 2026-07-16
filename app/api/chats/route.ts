@@ -4,7 +4,7 @@ import { createAdminClient } from "@/utils/supabase/admin";
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
   });
 }
 
@@ -34,7 +34,8 @@ export async function GET() {
     .limit(30);
 
   if (dbError) {
-    return json({ error: dbError.message }, 500);
+    console.error("chat_list_failed", dbError);
+    return json({ error: "Chats could not be loaded" }, 500);
   }
 
   return json({ data: data ?? [] });
@@ -62,7 +63,8 @@ export async function POST(req: Request) {
     .single();
 
   if (dbError) {
-    return json({ error: dbError.message }, 500);
+    console.error("chat_create_failed", dbError);
+    return json({ error: "Chat could not be created" }, 500);
   }
 
   return json({ data }, 201);

@@ -23,7 +23,7 @@ export default function PrivasiPage() {
           Kebijakan Privasi
         </h1>
         <p style={{ color: "#64748B", marginBottom: "28px" }}>
-          Terakhir diperbarui: 30 Juni 2026
+          Terakhir diperbarui: 15 Juli 2026
         </p>
 
         {[
@@ -37,11 +37,15 @@ export default function PrivasiPage() {
           },
           {
             title: "Lampiran dokumen",
-            body: "Gambar dan PDF yang Anda kirim diproses untuk menjawab pertanyaan terkait. PDF berbasis teks dapat diekstrak sebelum dikirim ke model AI. Jika dokumen berisi NPWP, NIK, alamat, atau data finansial, pastikan Anda memang ingin data tersebut dianalisis.",
+            body: "Gambar dan PDF yang Anda kirim diproses secara sementara untuk menjawab pertanyaan. PDF berbasis teks diekstrak di server; isi atau gambar yang relevan diteruskan ke penyedia model. Aplikasi tidak menyimpan berkas mentah sebagai lampiran riwayat, tetapi nama lampiran dicatat pada pesan. Samarkan NIK, NPWP, rekening, alamat, dan data lain yang tidak diperlukan.",
+          },
+          {
+            title: "Penyedia layanan",
+            body: "Supabase digunakan untuk autentikasi dan penyimpanan riwayat. Google Gemini digunakan untuk menghasilkan jawaban dan menganalisis konten lampiran. Pemrosesan oleh penyedia tersebut tunduk pada konfigurasi akun layanan dan ketentuan privasi masing-masing penyedia.",
           },
           {
             title: "Penyimpanan dan akses",
-            body: "Riwayat chat pengguna login disimpan di database Supabase dan hanya dapat diakses oleh akun terkait serta proses server internal. Data langganan hanya dikelola melalui akses admin.",
+            body: "Riwayat chat pengguna login disimpan di Supabase sampai dihapus melalui aplikasi atau melalui permintaan kepada admin. Riwayat hanya dapat diakses oleh akun terkait serta proses server internal. Peristiwa penggunaan disimpan untuk penerapan kuota dan keamanan; data langganan hanya dikelola melalui akses admin.",
           },
           {
             title: "Batasan layanan",

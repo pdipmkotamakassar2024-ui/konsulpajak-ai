@@ -7,6 +7,8 @@
 
 /* CSS Variables — Palet warna dari design spec */
 :root {
+  --font-inter: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-poppins: Poppins, Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --primary: #3B82F6;
   --primary-light: #60A5FA;
   --primary-dark: #2563EB;
