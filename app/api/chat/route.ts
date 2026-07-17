@@ -333,7 +333,8 @@ export async function POST(req: Request) {
         }
       } catch (error) {
         console.error("ai_stream_failed", error);
-        controller.enqueue(encoder.encode("\n\nLayanan AI mengalami gangguan. Coba kembali beberapa saat lagi."));
+        await releaseQuota(admin, usageEventId).catch((releaseError) => console.error("quota_release_failed", releaseError));
+        controller.enqueue(encoder.encode("\n\nLayanan AI sedang tidak tersedia. Kuota Anda tidak dikurangi; silakan coba lagi atau hubungi admin."));
       } finally {
         controller.close();
       }
