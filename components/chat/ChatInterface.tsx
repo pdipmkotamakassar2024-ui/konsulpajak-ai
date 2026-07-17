@@ -73,12 +73,14 @@ export default function ChatInterface({ user }: { user: User | null }) {
   }, []);
 
   const handleNewChat = () => {
+    clearError();
     setActiveChatId(null);
     setMessages([]);
   };
 
   const loadChat = async (id: string) => {
     if (!user) return;
+    clearError();
     setActiveChatId(id);
     setMessages([]);
 
@@ -124,6 +126,7 @@ export default function ChatInterface({ user }: { user: User | null }) {
 
   const handleSend = async (content: string, attachments?: ChatAttachment[]) => {
     if ((!content.trim() && (!attachments || attachments.length === 0)) || isLoading) return;
+    clearError();
 
     let currentChatId = activeChatId;
     const displayText = content || "Tolong analisis lampiran ini.";

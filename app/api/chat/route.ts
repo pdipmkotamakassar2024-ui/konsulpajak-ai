@@ -1,4 +1,3 @@
-import { createHmac } from "node:crypto";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText, streamText, type ModelMessage } from "ai";
 import { buildCoretaxSystemPrompt } from "@/lib/ai/coretax-prompt";
@@ -6,7 +5,7 @@ import { GEMINI_MODEL_ID, getGeminiGenerationSettings } from "@/lib/ai/generatio
 import { buildRegulatoryContext } from "@/lib/ai/regulatory-knowledge";
 import type { ChatAttachment } from "@/lib/chat/types";
 import { validateAndDecodeAttachments, type ValidatedAttachment } from "@/lib/chat/server-attachments";
-import { FREE_CHAT_LIMIT, QUOTA_WINDOW_MS } from "@/lib/chat/quota";
+import { FREE_CHAT_LIMIT, guestQuotaSubjectId, QUOTA_WINDOW_MS } from "@/lib/chat/quota";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { createClient } from "@/utils/supabase/server";
 
@@ -83,13 +82,9 @@ function guestCookieHeader(guestId: string) {
   return `${GUEST_COOKIE}=${encodeURIComponent(guestId)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=31536000${secure}`;
 }
 
-function guestSubjectId(req: Request, guestId: string) {
-  const forwardedFor = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  const fingerprint = forwardedFor
-    ? `${forwardedFor}|${req.headers.get("user-agent") || "no-ua"}`
-    : `cookie:${guestId}`;
+function guestSubjectId(guestId: string) {
   const secret = process.env.SUPABASE_SERVICE_ROLE_KEY || "local-only";
-  return createHmac("sha256", secret).update(fingerprint).digest("hex");
+  return guestQuotaSubjectId(guestId, secret);
 }
 
 async function extractPdfText(attachment: ValidatedAttachment) {
@@ -222,7 +217,7 @@ export async function POST(req: Request) {
     setCookie = guestCookieHeader(guestId);
   }
   const subjectType = user ? "user" : "guest";
-  const subjectId = user?.id || (guestId ? guestSubjectId(req, guestId) : null);
+  const subjectId = user?.id || (guestId ? guestSubjectId(guestId) : null);
   if (!subjectId) return textResponse("Sesi pengguna tidak valid. Muat ulang halaman.", 400);
 
   let coreMessages = sanitized.messages;
