@@ -8,7 +8,7 @@ describe("Gemini generation settings", () => {
     expect(GEMINI_MODEL_ID).toBe("gemini-2.5-flash");
     expect(settings.maxOutputTokens).toBe(4_096);
     expect(settings.providerOptions.google.thinkingConfig).toEqual({
-      thinkingBudget: 0,
+      thinkingBudget: 1_024,
       includeThoughts: false,
     });
   });

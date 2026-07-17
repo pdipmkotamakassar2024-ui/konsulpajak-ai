@@ -14,6 +14,15 @@ describe("regulatory knowledge", () => {
     expect(context).toContain("Buat Konsep SPT");
     expect(context).toContain("Jangan mengarahkan");
   });
+
+  it("retrieves the current construction rate matrix instead of the old 2 percent rate", () => {
+    const context = buildRegulatoryContext("Saya PT pelaksana konstruksi dengan SBU kecil, kontrak Rp2,5 miliar. Berapa PPh Final Pasal 4 ayat 2?");
+
+    expect(context).toContain("PP 9 Tahun 2022");
+    expect(context).toContain("1,75%");
+    expect(context).toContain("Rp43.750.000");
+    expect(context).toContain("tarif lama");
+  });
 });
 
 describe("Coretax prompt", () => {
@@ -23,5 +32,8 @@ describe("Coretax prompt", () => {
     expect(prompt).toContain("Koreksi atas jawaban sebelumnya");
     expect(prompt).toContain("Jangan mengarang tanggal operasional");
     expect(prompt).toContain("Tahun Pajak 2024 dan sebelumnya");
+    expect(prompt).toContain("klasifikasikan dahulu fakta penentu");
+    expect(prompt).toContain("Jangan menyetujui koreksi pengguna");
+    expect(prompt).toContain("Jangan menutup setiap jawaban dengan disclaimer generik");
   });
 });

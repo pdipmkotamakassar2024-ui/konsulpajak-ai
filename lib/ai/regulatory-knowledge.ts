@@ -8,9 +8,35 @@ export interface RegulatoryEntry {
   officialSources: { label: string; url: string }[];
 }
 
-export const REGULATORY_KNOWLEDGE_VERSION = "2026-07-15";
+export const REGULATORY_KNOWLEDGE_VERSION = "2026-07-17";
 
 export const REGULATORY_KNOWLEDGE: RegulatoryEntry[] = [
+  {
+    id: "pph-final-jasa-konstruksi-pp9-2022",
+    title: "PPh Final Jasa Konstruksi berdasarkan PP 9 Tahun 2022",
+    reviewedAt: REGULATORY_KNOWLEDGE_VERSION,
+    effectiveFrom: "2022-02-21",
+    keywords: [
+      "jasa konstruksi", "pekerjaan konstruksi", "pelaksana konstruksi", "konsultansi konstruksi",
+      "konstruksi terintegrasi", "sbu", "sertifikat badan usaha", "sbu kecil", "pph final konstruksi",
+      "pph pasal 4 ayat 2", "pph 4 ayat 2", "nilai kontrak",
+    ],
+    facts: [
+      "PP 9 Tahun 2022 berlaku sejak 21 Februari 2022 dan mengganti matriks tarif lama jasa konstruksi. Tarif 2% untuk pelaksanaan konstruksi berkualifikasi kecil adalah tarif lama; sejak tanggal tersebut tarif yang berlaku menjadi 1,75%.",
+      "Pekerjaan konstruksi oleh penyedia yang memiliki SBU kualifikasi kecil, atau sertifikat kompetensi kerja untuk usaha orang perseorangan: 1,75%.",
+      "Pekerjaan konstruksi tanpa SBU atau sertifikat kompetensi kerja untuk usaha orang perseorangan: 4%.",
+      "Pekerjaan konstruksi oleh penyedia selain kategori kecil dan tanpa sertifikat di atas (antara lain berkualifikasi menengah/besar): 2,65%.",
+      "Pekerjaan konstruksi terintegrasi dengan SBU: 2,65%; tanpa SBU: 4%.",
+      "Jasa konsultansi konstruksi dengan SBU atau sertifikat kompetensi kerja untuk usaha orang perseorangan: 3,5%; tanpa sertifikat: 6%.",
+      "Tarif ditentukan oleh jenis layanan dan status sertifikasi/kualifikasi, bukan semata-mata nilai kontrak atau bentuk badan. Jika pengguna sudah menyebut PT, pelaksana/pekerjaan konstruksi, dan SBU kecil, data penentu sudah cukup: gunakan tarif 1,75% tanpa meminta konfirmasi tambahan.",
+      "Contoh pasti dengan asumsi Rp2.500.000.000 merupakan jumlah pembayaran sebelum PPN: PPh Final = 1,75% × Rp2.500.000.000 = Rp43.750.000. Jangan menjawab 2% atau Rp50.000.000 untuk pelaksana konstruksi dengan SBU kecil pada transaksi yang tunduk pada PP 9 Tahun 2022.",
+    ],
+    officialSources: [
+      { label: "BPK — PP 9 Tahun 2022 (status berlaku dan matriks tarif)", url: "https://peraturan.bpk.go.id/Details/199710/pp-no-9-tahun-2022" },
+      { label: "JDIH Kemenkeu — PP 9 Tahun 2022", url: "https://www.jdih.kemenkeu.go.id/dok/pp-9-tahun-2022/view" },
+      { label: "DJP — Tarif PPh Final Jasa Konstruksi Turun", url: "https://pajak.go.id/index.php/en/node/76970" },
+    ],
+  },
   {
     id: "marketplace-pph22-pmk37-2025",
     title: "Pemungutan PPh Pasal 22 oleh marketplace",
