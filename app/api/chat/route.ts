@@ -1,7 +1,8 @@
 import { createHmac } from "node:crypto";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { streamText, type ModelMessage } from "ai";
+import { generateText, streamText, type ModelMessage } from "ai";
 import { buildCoretaxSystemPrompt } from "@/lib/ai/coretax-prompt";
+import { GEMINI_MODEL_ID, getGeminiGenerationSettings } from "@/lib/ai/generation-config";
 import { buildRegulatoryContext } from "@/lib/ai/regulatory-knowledge";
 import type { ChatAttachment } from "@/lib/chat/types";
 import { validateAndDecodeAttachments, type ValidatedAttachment } from "@/lib/chat/server-attachments";
@@ -285,7 +286,12 @@ export async function POST(req: Request) {
 
   let result: ReturnType<typeof streamText>;
   try {
-    result = streamText({ model: google("gemini-2.5-flash"), system, messages: modelMessages, temperature: 0.2, maxOutputTokens: 2_048 });
+    result = streamText({
+      model: google(GEMINI_MODEL_ID),
+      system,
+      messages: modelMessages,
+      ...getGeminiGenerationSettings(),
+    });
   } catch (error) {
     await releaseQuota(admin, usageEventId);
     console.error("ai_initialization_failed", error);
@@ -302,7 +308,24 @@ export async function POST(req: Request) {
           fullText += chunk;
           controller.enqueue(encoder.encode(chunk));
         }
-        if (!fullText.trim()) controller.enqueue(encoder.encode("Respons AI kosong. Silakan coba lagi dengan pertanyaan lebih spesifik."));
+        if (!fullText.trim()) {
+          const [finishReason, usage, warnings] = await Promise.all([
+            result.finishReason,
+            result.usage,
+            result.warnings,
+          ]);
+          console.warn("ai_empty_stream", { finishReason, usage, warnings });
+
+          const retry = await generateText({
+            model: google(GEMINI_MODEL_ID),
+            system,
+            messages: modelMessages,
+            ...getGeminiGenerationSettings(),
+          });
+          fullText = retry.text.trim();
+          if (!fullText) throw new Error(`Model returned an empty response after retry (${retry.finishReason}).`);
+          controller.enqueue(encoder.encode(fullText));
+        }
         if (user && chatId && fullText.trim()) {
           const { error } = await admin.from("messages").insert({ chat_id: chatId, role: "assistant", content: fullText.trim() });
           if (error) console.error("assistant_message_storage_failed", error);
