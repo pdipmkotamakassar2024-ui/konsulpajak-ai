@@ -10,6 +10,17 @@ Set these in Vercel Project Settings > Environment Variables:
 - `SUPABASE_SERVICE_ROLE_KEY` (server-only, never expose to browser)
 - `GOOGLE_GENERATIVE_AI_API_KEY` (rotated key only)
 - `ADMIN_EMAILS` (comma-separated, server-only)
+- `ADMIN_USERNAME` (username khusus halaman `/admin/login`; default `admin` bila tidak diisi)
+- `ADMIN_LOGIN_EMAIL` (akun email/password Supabase yang dipakai oleh login admin; harus tercantum di `ADMIN_EMAILS`)
+
+## Admin Login
+
+Login admin terpisah dari login Google milik member dan tersedia di `https://konsulpajak-ai.com/admin/login`.
+
+1. Di Supabase Authentication > Users, buat akun email/password admin atau atur password pada akun admin yang sudah ada.
+2. Isi `ADMIN_LOGIN_EMAIL` dengan email akun tersebut dan pastikan email yang sama ada di `ADMIN_EMAILS`.
+3. Isi `ADMIN_USERNAME` dengan username yang akan digunakan pengelola.
+4. Redeploy setelah mengubah environment variables. Password tidak disimpan di Vercel atau source code; Supabase Auth yang menyimpan dan memverifikasinya.
 
 Apply every file in `supabase/migrations/` in filename order before deploying API changes. The 15 July 2026 migration adds validated constraints and the atomic `consume_chat_quota` RPC required by `/api/chat`.
 

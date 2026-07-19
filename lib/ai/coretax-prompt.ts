@@ -29,6 +29,8 @@ PERILAKU JAWABAN
 
 CORETAX
 - Untuk Tahun Pajak 2025 dan sesudahnya, utamakan prosedur Coretax DJP di https://coretaxdjp.pajak.go.id.
+- Jika pengguna bertanya cara daftar/buat NPWP online, selalu arahkan langsung ke portal resmi Coretax DJP di https://coretaxdjp.pajak.go.id dan berikan alur pendaftaran Coretax dari konteks. Jangan mengarahkan ke e-Registration/ereg lama.
+- Bedakan pengguna baru yang perlu mendaftar NPWP dengan pengguna yang sudah memiliki NPWP dan hanya perlu mengaktifkan akun Coretax.
 - Untuk Tahun Pajak 2024 dan sebelumnya, jangan memaksakan alur Coretax bila layanan resmi masih menggunakan sistem/formulir lama.
 - Jangan mencampurkan menu atau nama formulir lama ke alur Coretax 2025+.
 

@@ -62,6 +62,11 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
+  const handleLogout = async () => {
+    await fetch("/api/admin/logout", { method: "POST" });
+    window.location.assign("/admin/login");
+  };
+
   if (isAuthenticated === null) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#F8FAFC", fontFamily: "var(--font-inter), sans-serif" }}>
@@ -76,8 +81,8 @@ export default function AdminDashboard() {
         <div style={{ background: "white", padding: "40px", borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.05)", width: "100%", maxWidth: "400px", textAlign: "center" }}>
           <h1 style={{ fontSize: "24px", fontWeight: 700, color: "#991B1B", marginBottom: "16px" }}>Akses Ditolak</h1>
           <p style={{ color: "#374151", marginBottom: "24px" }}>{errorMessage}</p>
-          <Link href="/login" style={{ display: "inline-block", padding: "12px 24px", background: "#3B82F6", color: "white", textDecoration: "none", borderRadius: "8px", fontWeight: 600 }}>
-            Ke Halaman Login
+          <Link href="/admin/login" style={{ display: "inline-block", padding: "12px 24px", background: "#3B82F6", color: "white", textDecoration: "none", borderRadius: "8px", fontWeight: 600 }}>
+            Login Admin
           </Link>
         </div>
       </div>
@@ -87,7 +92,10 @@ export default function AdminDashboard() {
   return (
     <div style={{ minHeight: "100vh", background: "#F8FAFC", fontFamily: "var(--font-inter), sans-serif", padding: "40px 20px" }}>
       <div style={{ maxWidth: "800px", margin: "0 auto" }}>
-        <h1 style={{ fontSize: "28px", fontWeight: 700, color: "#0B1B3B", marginBottom: "32px" }}>Dashboard Admin</h1>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "16px", marginBottom: "32px" }}>
+          <h1 style={{ fontSize: "28px", fontWeight: 700, color: "#0B1B3B", margin: 0 }}>Dashboard Admin</h1>
+          <button onClick={handleLogout} type="button" style={{ padding: "9px 15px", border: "1px solid #CBD5E1", borderRadius: "8px", color: "#334155", background: "white", fontWeight: 600, cursor: "pointer" }}>Keluar</button>
+        </div>
 
         <div style={{ background: "white", padding: "30px", borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.05)", marginBottom: "40px" }}>
           <h2 style={{ fontSize: "18px", fontWeight: 600, color: "#1F2937", marginBottom: "20px" }}>Aktivasi Paket Manual</h2>

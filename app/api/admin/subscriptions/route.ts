@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
-import { isAdminEmail } from '@/lib/auth/admin';
+import { isPasswordAdminSession } from '@/lib/auth/admin';
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user || !isAdminEmail(user.email)) {
+    if (authError || !isPasswordAdminSession(user)) {
       return json({ error: "Unauthorized: Admin access required" }, 401);
     }
 
@@ -61,7 +61,7 @@ export async function GET() {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (authError || !user || !isAdminEmail(user.email)) {
+    if (authError || !isPasswordAdminSession(user)) {
       return json({ error: "Unauthorized: Admin access required" }, 401);
     }
 

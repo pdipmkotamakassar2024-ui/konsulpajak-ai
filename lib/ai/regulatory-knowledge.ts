@@ -8,9 +8,30 @@ export interface RegulatoryEntry {
   officialSources: { label: string; url: string }[];
 }
 
-export const REGULATORY_KNOWLEDGE_VERSION = "2026-07-17";
+export const REGULATORY_KNOWLEDGE_VERSION = "2026-07-20";
 
 export const REGULATORY_KNOWLEDGE: RegulatoryEntry[] = [
+  {
+    id: "pendaftaran-npwp-online-coretax",
+    title: "Pendaftaran NPWP Online melalui Coretax DJP",
+    reviewedAt: REGULATORY_KNOWLEDGE_VERSION,
+    keywords: [
+      "daftar npwp", "buat npwp", "bikin npwp", "npwp online", "registrasi npwp",
+      "pendaftaran npwp", "pendaftaran wajib pajak", "cara mendapat npwp", "aktivasi nik",
+    ],
+    facts: [
+      "Pendaftaran NPWP online yang berlaku saat ini harus diarahkan langsung ke portal resmi Coretax DJP: https://coretaxdjp.pajak.go.id. Jangan mengarahkan pengguna ke e-Registration/ereg lama.",
+      "Untuk orang pribadi penduduk Indonesia yang belum terdaftar: buka Coretax DJP, klik 'Daftar di sini', pilih 'Perorangan', pilih bahwa Wajib Pajak memiliki NIK, lalu pilih 'Pendaftaran dengan Aktivasi NIK/Aktivasi NIK'.",
+      "Lengkapi isian, gunakan email dan nomor ponsel aktif untuk OTP, lakukan verifikasi identitas dengan swafoto dan Validasi Foto, centang pernyataan, lalu klik Kirim Pengajuan.",
+      "Setelah permohonan berhasil, periksa email yang didaftarkan untuk menerima nomor NPWP dan cetakan NPWP digital dalam format PDF; kartu tidak lagi dikirim secara fisik melalui pos.",
+      "Bedakan pendaftaran Wajib Pajak baru dengan aktivasi akun. Pengguna yang sudah memiliki NPWP tetapi belum memiliki akses Coretax tidak perlu mendaftar NPWP ulang; arahkan ke menu Aktivasi Akun Wajib Pajak.",
+      "Jangan meminta pengguna mengirimkan NIK, swafoto, OTP, atau kata sandi melalui percakapan. Pastikan domain tujuan adalah coretaxdjp.pajak.go.id.",
+    ],
+    officialSources: [
+      { label: "DJP Coretaxpedia — Pendaftaran WP Orang Pribadi", url: "https://www.pajak.go.id/coretaxpedia/pendaftaran-wp-orang-pribadi" },
+      { label: "Portal resmi Coretax DJP", url: "https://coretaxdjp.pajak.go.id" },
+    ],
+  },
   {
     id: "pph-final-jasa-konstruksi-pp9-2022",
     title: "PPh Final Jasa Konstruksi berdasarkan PP 9 Tahun 2022",

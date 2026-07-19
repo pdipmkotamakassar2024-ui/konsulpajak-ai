@@ -15,6 +15,16 @@ describe("regulatory knowledge", () => {
     expect(context).toContain("Jangan mengarahkan");
   });
 
+  it("always directs online NPWP registration to the official Coretax portal", () => {
+    const entries = selectRegulatoryEntries("bagaimana cara daftar NPWP online?");
+    const context = buildRegulatoryContext("bagaimana cara daftar NPWP online?");
+
+    expect(entries[0]?.id).toBe("pendaftaran-npwp-online-coretax");
+    expect(context).toContain("https://coretaxdjp.pajak.go.id");
+    expect(context).toContain("Jangan mengarahkan pengguna ke e-Registration/ereg lama");
+    expect(context).toContain("Aktivasi Akun Wajib Pajak");
+  });
+
   it("retrieves the current construction rate matrix instead of the old 2 percent rate", () => {
     const context = buildRegulatoryContext("Saya PT pelaksana konstruksi dengan SBU kecil, kontrak Rp2,5 miliar. Berapa PPh Final Pasal 4 ayat 2?");
 
@@ -32,6 +42,7 @@ describe("Coretax prompt", () => {
     expect(prompt).toContain("Koreksi atas jawaban sebelumnya");
     expect(prompt).toContain("Jangan mengarang tanggal operasional");
     expect(prompt).toContain("Tahun Pajak 2024 dan sebelumnya");
+    expect(prompt).toContain("cara daftar/buat NPWP online");
     expect(prompt).toContain("klasifikasikan dahulu fakta penentu");
     expect(prompt).toContain("Jangan menyetujui koreksi pengguna");
     expect(prompt).toContain("Jangan menutup setiap jawaban dengan disclaimer generik");
