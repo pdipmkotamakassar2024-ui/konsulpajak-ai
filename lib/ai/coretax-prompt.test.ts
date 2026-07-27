@@ -33,6 +33,31 @@ describe("regulatory knowledge", () => {
     expect(context).toContain("Rp43.750.000");
     expect(context).toContain("tarif lama");
   });
+
+  it("answers what PPh Unifikasi is without a generic refusal", () => {
+    const context = buildRegulatoryContext("apa itu pph unifikasi?");
+
+    expect(selectRegulatoryEntries("apa itu pph unifikasi?")[0]?.id).toBe("spt-masa-pph-unifikasi-coretax");
+    expect(context).toContain("PPh Pasal 4 ayat (2)");
+    expect(context).toContain("bukan jenis atau tarif pajak baru");
+    expect(context).toContain("Jangan menjawab bahwa PPh Unifikasi mencakup PPh Pasal 21 secara umum");
+  });
+
+  it("retrieves the official PPh 23 service categories", () => {
+    const query = "jasa apa saja yang masuk dalam pph unifikasi atau pph 23?";
+    const entries = selectRegulatoryEntries(query);
+    const context = buildRegulatoryContext(query);
+
+    expect(entries.map((entry) => entry.id)).toContain("spt-masa-pph-unifikasi-coretax");
+    expect(entries.map((entry) => entry.id)).toContain("objek-jasa-pph23-pmk141-2015");
+    expect(context).toContain("pembuatan/pengelolaan website");
+    expect(context).toContain("freight forwarding");
+    expect(context).toContain("APBN/APBD");
+  });
+
+  it("does not force a blanket refusal for an unmatched stable concept", () => {
+    expect(buildRegulatoryContext("apa itu kredit pajak?")).toContain("tetap boleh menjawab konsep perpajakan umum");
+  });
 });
 
 describe("Coretax prompt", () => {
@@ -46,5 +71,6 @@ describe("Coretax prompt", () => {
     expect(prompt).toContain("klasifikasikan dahulu fakta penentu");
     expect(prompt).toContain("Jangan menyetujui koreksi pengguna");
     expect(prompt).toContain("Jangan menutup setiap jawaban dengan disclaimer generik");
+    expect(prompt).toContain("bukan alasan untuk menolak pertanyaan konsep pajak umum");
   });
 });

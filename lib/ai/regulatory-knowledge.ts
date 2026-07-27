@@ -8,7 +8,7 @@ export interface RegulatoryEntry {
   officialSources: { label: string; url: string }[];
 }
 
-export const REGULATORY_KNOWLEDGE_VERSION = "2026-07-20";
+export const REGULATORY_KNOWLEDGE_VERSION = "2026-07-27";
 
 export const REGULATORY_KNOWLEDGE: RegulatoryEntry[] = [
   {
@@ -30,6 +30,51 @@ export const REGULATORY_KNOWLEDGE: RegulatoryEntry[] = [
     officialSources: [
       { label: "DJP Coretaxpedia — Pendaftaran WP Orang Pribadi", url: "https://www.pajak.go.id/coretaxpedia/pendaftaran-wp-orang-pribadi" },
       { label: "Portal resmi Coretax DJP", url: "https://coretaxdjp.pajak.go.id" },
+    ],
+  },
+  {
+    id: "spt-masa-pph-unifikasi-coretax",
+    title: "SPT Masa PPh Unifikasi melalui Coretax DJP",
+    reviewedAt: REGULATORY_KNOWLEDGE_VERSION,
+    effectiveFrom: "2025-01-01",
+    keywords: [
+      "pph unifikasi", "spt unifikasi", "spt masa unifikasi", "ebupot unifikasi",
+      "e-bupot unifikasi", "bukti potong unifikasi", "apa itu unifikasi", "coretax unifikasi",
+    ],
+    facts: [
+      "SPT Masa PPh Unifikasi adalah satu SPT Masa yang dipakai Pemotong/Pemungut untuk melaporkan kewajiban pemotongan/pemungutan, penyetoran hasil pemotongan/pemungutan, dan/atau penyetoran sendiri atas beberapa jenis PPh dalam satu Masa Pajak.",
+      "Cakupannya meliputi PPh Pasal 4 ayat (2), PPh Pasal 15, PPh Pasal 22, dan PPh Pasal 23/26. PPh Pasal 21 dan PPh Pasal 26 yang berkaitan dengan pekerjaan, jasa, atau kegiatan orang pribadi dilaporkan melalui SPT Masa PPh Pasal 21/26, bukan digabung secara umum ke SPT Masa PPh Unifikasi.",
+      "Tujuan unifikasi adalah menyatukan pembuatan bukti potong/pungut dan pelaporan beberapa jenis PPh yang sebelumnya terpisah. PPh Unifikasi bukan jenis atau tarif pajak baru.",
+      "Untuk masa pajak pada era Coretax, akses portal https://coretaxdjp.pajak.go.id lalu gunakan menu Surat Pemberitahuan (SPT), buat SPT, dan pilih jenis SPT PPh Unifikasi. Coretax menggunakan SPT Masa PPh Unifikasi untuk seluruh Wajib Pajak, tidak lagi dibedakan antara instansi pemerintah dan non-instansi pemerintah.",
+      "Sejak PMK 81 Tahun 2024 berlaku, pembayaran/penyetoran masa untuk PPh yang dicakup diseragamkan paling lambat tanggal 15 bulan berikutnya; batas pelaporan SPT Masa PPh Unifikasi tetap paling lambat tanggal 20 bulan berikutnya. Jika jatuh tempo bertepatan dengan hari libur, ikuti ketentuan pergeseran ke hari kerja berikutnya.",
+      "Jangan menjawab bahwa PPh Unifikasi mencakup PPh Pasal 21 secara umum. Jelaskan pengecualian PPh 21/26 orang pribadi agar pengguna tidak salah memilih SPT.",
+    ],
+    officialSources: [
+      { label: "DJP — SPT Masa PPh Unifikasi", url: "https://pajak.go.id/panduan-layanan-pajak/konten/pelaporan/2025/badan/spt/spt-masa-pph-unifikasi" },
+      { label: "DJP — Buku Manual Coretax SPT Masa Unifikasi", url: "https://pajak.go.id/sites/default/files/2025-01/Buku%20Manual%20Coretax%202024%20-%20Seri%20SPT%20Masa%20Unifikasi.pdf" },
+      { label: "DJP — PMK 81/2024 dan batas penyetoran tanggal 15", url: "https://www.pajak.go.id/id/siaran-pers/pemerintah-terbitkan-aturan-pelaksanaan-sistem-inti-administrasi-perpajakan-coretax" },
+    ],
+  },
+  {
+    id: "objek-jasa-pph23-pmk141-2015",
+    title: "Objek Jasa PPh Pasal 23 berdasarkan PMK 141/PMK.03/2015",
+    reviewedAt: REGULATORY_KNOWLEDGE_VERSION,
+    effectiveFrom: "2015-08-27",
+    keywords: [
+      "pph 23", "pph23", "pasal 23", "jasa pph 23", "objek pph 23", "tarif pph 23",
+      "jasa apa saja", "jenis jasa", "pmk 141", "jasa teknik", "jasa manajemen", "jasa konsultan",
+    ],
+    facts: [
+      "Imbalan jasa yang menjadi objek PPh Pasal 23 dipotong 2% dari jumlah bruto tidak termasuk PPN, sepanjang dibayarkan kepada Wajib Pajak dalam negeri/BUT, tidak sudah dikenai PPh final, dan bukan jasa yang telah dipotong PPh Pasal 21. Jika penerima tidak memiliki NPWP, tarif menjadi 100% lebih tinggi sesuai ketentuan yang berlaku.",
+      "Kelompok utama objek jasa PPh Pasal 23 adalah jasa teknik, jasa manajemen, jasa konsultan, serta 'jasa lain' yang dirinci dalam PMK 141/PMK.03/2015. Jasa konstruksi harus diperiksa khusus: jika tunduk pada rezim PPh Final jasa konstruksi, jangan dipaksakan menjadi PPh Pasal 23.",
+      "Daftar jasa lain PMK 141 meliputi: penilai/appraisal; aktuaris; akuntansi, pembukuan dan atestasi laporan keuangan; hukum; arsitektur; perencanaan kota/arsitektur lanskap; desain; pengeboran serta jasa penunjang migas, panas bumi dan pertambangan; penunjang penerbangan/bandar udara; penebangan hutan; pengolahan limbah; penyedia tenaga kerja/tenaga ahli; perantara/keagenan; perdagangan surat berharga tertentu; kustodian; dubbing/sulih suara; mixing film; pembuatan sarana promosi; software, hardware dan sistem komputer; pembuatan/pengelolaan website; internet; penyimpanan/pengolahan/penyaluran data; instalasi dan pemeliharaan mesin/peralatan/utilitas; perawatan kendaraan; maklon; keamanan; event organizer; media/periklanan; pembasmian hama; cleaning service; sedot septic tank; pemeliharaan kolam; serta katering/tata boga.",
+      "Daftar tersebut juga mencakup: freight forwarding; logistik; pengurusan dokumen; pengepakan; loading/unloading; laboratorium/pengujian; pengelolaan parkir; penyondiran tanah; penyiapan/pengolahan lahan; pembibitan/penanaman; pemeliharaan tanaman; pemanenan; pengolahan hasil pertanian/perkebunan/perikanan/peternakan/perhutanan; dekorasi; pencetakan/penerbitan; penerjemahan; pengangkutan/ekspedisi selain yang diatur Pasal 15; pelayanan kepelabuhanan; pengangkutan melalui pipa; penitipan anak; pelatihan/kursus; pengiriman/pengisian uang ATM; sertifikasi; survei; tester; serta jasa lain yang pembayarannya dibebankan pada APBN/APBD.",
+      "Dasar pemotongan untuk jasa selain katering pada prinsipnya seluruh pembayaran tidak termasuk PPN. Gaji tenaga kerja, material, pembayaran pihak ketiga, dan reimbursement dapat dikeluarkan dari jumlah bruto hanya bila memenuhi syarat serta didukung kontrak, faktur, dan bukti pembayaran yang dipersyaratkan; tanpa bukti, dasar pemotongan adalah keseluruhan pembayaran tidak termasuk PPN.",
+      "Sebelum menyimpulkan suatu transaksi terkena PPh Pasal 23, identifikasi jenis jasa, pihak pemberi dan penerima penghasilan, status dalam negeri/BUT, apakah sudah terkena PPh 21, PPh final atau Pasal 15, serta komponen jumlah bruto dan PPN.",
+    ],
+    officialSources: [
+      { label: "DJP — PPh Pasal 23/26", url: "https://www.pajak.go.id/id/pph-pasal-2326" },
+      { label: "DJP — PMK 141/PMK.03/2015 (status aktif dan daftar jasa)", url: "https://pajak.go.id/en/node/63200" },
     ],
   },
   {
@@ -159,7 +204,7 @@ export function selectRegulatoryEntries(query: string, maxEntries = 4): Regulato
 
 export function buildRegulatoryContext(query: string): string {
   const entries = selectRegulatoryEntries(query);
-  if (entries.length === 0) return "Tidak ada entri knowledge base terkurasi yang cocok. Nyatakan keterbatasan dan jangan mengarang aturan, tarif, tanggal, atau prosedur.";
+  if (entries.length === 0) return "Tidak ada entri knowledge base terkurasi yang cocok. Anda tetap boleh menjawab konsep perpajakan umum yang stabil secara ringkas. Jangan menolak hanya karena entri tidak ditemukan, tetapi jangan mengarang tarif, tenggat, dasar hukum, atau prosedur yang dapat berubah; bila fakta mutakhir itu menentukan jawaban, nyatakan bagian yang perlu diverifikasi melalui DJP/JDIH.";
 
   return entries.map((entry) => [
     `### ${entry.title}`,
