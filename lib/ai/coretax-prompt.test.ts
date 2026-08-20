@@ -30,6 +30,7 @@ describe("regulatory knowledge", () => {
 
     expect(context).toContain("PP 9 Tahun 2022");
     expect(context).toContain("1,75%");
+    expect(context).toContain("Sertifikat Badan Usaha");
     expect(context).toContain("Rp43.750.000");
     expect(context).toContain("tarif lama");
   });
@@ -39,6 +40,7 @@ describe("regulatory knowledge", () => {
 
     expect(selectRegulatoryEntries("apa itu pph unifikasi?")[0]?.id).toBe("spt-masa-pph-unifikasi-coretax");
     expect(context).toContain("PPh Pasal 4 ayat (2)");
+    expect(context).toContain("jangan menyebutnya sebagai pajak yang dipotong bendahara pemerintah");
     expect(context).toContain("bukan jenis atau tarif pajak baru");
     expect(context).toContain("bukan tanggal lahir atau mulai berlakunya konsep PPh Unifikasi");
     expect(context).toContain("Jangan menjawab bahwa PPh Unifikasi mencakup PPh Pasal 21 secara umum");

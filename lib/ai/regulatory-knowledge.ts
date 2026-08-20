@@ -43,6 +43,7 @@ export const REGULATORY_KNOWLEDGE: RegulatoryEntry[] = [
     facts: [
       "SPT Masa PPh Unifikasi adalah satu SPT Masa yang dipakai Pemotong/Pemungut untuk melaporkan kewajiban pemotongan/pemungutan, penyetoran hasil pemotongan/pemungutan, dan/atau penyetoran sendiri atas beberapa jenis PPh dalam satu Masa Pajak.",
       "Cakupannya meliputi PPh Pasal 4 ayat (2), PPh Pasal 15, PPh Pasal 22, dan PPh Pasal 23/26. PPh Pasal 21 dan PPh Pasal 26 yang berkaitan dengan pekerjaan, jasa, atau kegiatan orang pribadi dilaporkan melalui SPT Masa PPh Pasal 21/26, bukan digabung secara umum ke SPT Masa PPh Unifikasi.",
+      "Jika hanya menjelaskan cakupan, jangan menambahkan definisi bebas tiap pasal. Khusus PPh Pasal 15 berkaitan dengan norma penghitungan khusus untuk Wajib Pajak/sektor tertentu; jangan menyebutnya sebagai pajak yang dipotong bendahara pemerintah.",
       "Tujuan unifikasi adalah menyatukan pembuatan bukti potong/pungut dan pelaporan beberapa jenis PPh yang sebelumnya terpisah. PPh Unifikasi bukan jenis atau tarif pajak baru.",
       "PPh Unifikasi sudah dikenal sebelum implementasi Coretax. Tanggal 1 Januari 2025 berkaitan dengan implementasi Coretax/prosedur dalam konteks ini, bukan tanggal lahir atau mulai berlakunya konsep PPh Unifikasi. Jangan pernah menyatakan 'PPh Unifikasi berlaku sejak 1 Januari 2025' kecuali sumber resmi khusus memang membuktikan klaim tersebut.",
       "Untuk masa pajak pada era Coretax, akses portal https://coretaxdjp.pajak.go.id lalu gunakan menu Surat Pemberitahuan (SPT), buat SPT, dan pilih jenis SPT PPh Unifikasi. Coretax menggunakan SPT Masa PPh Unifikasi untuk seluruh Wajib Pajak, tidak lagi dibedakan antara instansi pemerintah dan non-instansi pemerintah.",
@@ -89,6 +90,7 @@ export const REGULATORY_KNOWLEDGE: RegulatoryEntry[] = [
     ],
     facts: [
       "PP 9 Tahun 2022 berlaku sejak 21 Februari 2022 dan mengganti matriks tarif lama jasa konstruksi. Tarif 2% untuk pelaksanaan konstruksi berkualifikasi kecil adalah tarif lama; sejak tanggal tersebut tarif yang berlaku menjadi 1,75%.",
+      "SBU adalah Sertifikat Badan Usaha, bukan 'Surat Bukti Usaha'. Gunakan kepanjangan resmi ini bila perlu mengeja singkatannya.",
       "Pekerjaan konstruksi oleh penyedia yang memiliki SBU kualifikasi kecil, atau sertifikat kompetensi kerja untuk usaha orang perseorangan: 1,75%.",
       "Pekerjaan konstruksi tanpa SBU atau sertifikat kompetensi kerja untuk usaha orang perseorangan: 4%.",
       "Pekerjaan konstruksi oleh penyedia selain kategori kecil dan tanpa sertifikat di atas (antara lain berkualifikasi menengah/besar): 2,65%.",
