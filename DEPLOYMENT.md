@@ -8,7 +8,8 @@ Set these in Vercel Project Settings > Environment Variables:
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY` (server-only, never expose to browser)
-- `GOOGLE_GENERATIVE_AI_API_KEY` (rotated key only)
+- `GROQ_API_KEY` (primary provider; rotated key only)
+- `GOOGLE_GENERATIVE_AI_API_KEY` (optional fallback)
 - `ADMIN_EMAILS` (comma-separated, server-only)
 - `ADMIN_USERNAME` (username khusus halaman `/admin/login`; default `admin` bila tidak diisi)
 - `ADMIN_LOGIN_EMAIL` (akun email/password Supabase yang dipakai oleh login admin; harus tercantum di `ADMIN_EMAILS`)

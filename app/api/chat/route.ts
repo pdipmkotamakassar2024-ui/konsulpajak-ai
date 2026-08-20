@@ -1,7 +1,8 @@
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createGroq } from "@ai-sdk/groq";
 import { generateText, streamText, type ModelMessage } from "ai";
 import { buildCoretaxSystemPrompt } from "@/lib/ai/coretax-prompt";
-import { GEMINI_MODEL_ID, getGeminiGenerationSettings } from "@/lib/ai/generation-config";
+import { GEMINI_MODEL_ID, GROQ_MODEL_ID, getGeminiGenerationSettings, getGroqGenerationSettings } from "@/lib/ai/generation-config";
 import { buildCuratedFallbackAnswer, classifyAIProviderError } from "@/lib/ai/provider-fallback";
 import { buildRegulatoryContext } from "@/lib/ai/regulatory-knowledge";
 import type { ChatAttachment } from "@/lib/chat/types";
@@ -198,8 +199,9 @@ export async function POST(req: Request) {
     return textResponse("Konfigurasi server belum lengkap. Hubungi admin.", 503);
   }
 
-  const apiKey = (process.env.GOOGLE_GENERATIVE_AI_API_KEY || "").trim();
-  if (!apiKey) return textResponse("Layanan AI sedang belum tersedia. Hubungi admin.", 503);
+  const groqApiKey = (process.env.GROQ_API_KEY || "").trim();
+  const googleApiKey = (process.env.GOOGLE_GENERATIVE_AI_API_KEY || "").trim();
+  if (!groqApiKey && !googleApiKey) return textResponse("Layanan AI sedang belum tersedia. Hubungi admin.", 503);
 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -278,15 +280,19 @@ export async function POST(req: Request) {
   const recentQuestionContext = coreMessages.filter((message) => message.role === "user").slice(-4).map((message) => message.content).join("\n");
   const currentDate = new Intl.DateTimeFormat("id-ID", { dateStyle: "long", timeZone: "Asia/Makassar" }).format(new Date());
   const system = buildCoretaxSystemPrompt({ currentDate, regulatoryContext: buildRegulatoryContext(recentQuestionContext) });
-  const google = createGoogleGenerativeAI({ apiKey });
+  const provider = groqApiKey ? "groq" : "google";
+  const model = groqApiKey
+    ? createGroq({ apiKey: groqApiKey })(GROQ_MODEL_ID)
+    : createGoogleGenerativeAI({ apiKey: googleApiKey })(GEMINI_MODEL_ID);
+  const generationSettings = provider === "groq" ? getGroqGenerationSettings() : getGeminiGenerationSettings();
 
   let result: ReturnType<typeof streamText>;
   try {
     result = streamText({
-      model: google(GEMINI_MODEL_ID),
+      model,
       system,
       messages: modelMessages,
-      ...getGeminiGenerationSettings(),
+      ...generationSettings,
     });
   } catch (error) {
     await releaseQuota(admin, usageEventId);
@@ -313,10 +319,10 @@ export async function POST(req: Request) {
           console.warn("ai_empty_stream", { finishReason, usage, warnings });
 
           const retry = await generateText({
-            model: google(GEMINI_MODEL_ID),
+            model,
             system,
             messages: modelMessages,
-            ...getGeminiGenerationSettings(),
+            ...generationSettings,
           });
           fullText = retry.text.trim();
           if (!fullText) throw new Error(`Model returned an empty response after retry (${retry.finishReason}).`);

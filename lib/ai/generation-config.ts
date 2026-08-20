@@ -1,4 +1,12 @@
 export const GEMINI_MODEL_ID = "gemini-2.5-flash";
+export const GROQ_MODEL_ID = "openai/gpt-oss-120b";
+
+export function getGroqGenerationSettings() {
+  return {
+    temperature: 0.2,
+    maxOutputTokens: 4_096,
+  };
+}
 
 export function getGeminiGenerationSettings() {
   return {
