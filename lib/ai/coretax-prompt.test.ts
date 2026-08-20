@@ -40,6 +40,7 @@ describe("regulatory knowledge", () => {
     expect(selectRegulatoryEntries("apa itu pph unifikasi?")[0]?.id).toBe("spt-masa-pph-unifikasi-coretax");
     expect(context).toContain("PPh Pasal 4 ayat (2)");
     expect(context).toContain("bukan jenis atau tarif pajak baru");
+    expect(context).toContain("bukan tanggal lahir atau mulai berlakunya konsep PPh Unifikasi");
     expect(context).toContain("Jangan menjawab bahwa PPh Unifikasi mencakup PPh Pasal 21 secara umum");
   });
 
@@ -73,6 +74,8 @@ describe("Coretax prompt", () => {
     expect(prompt).toContain("Jangan menutup setiap jawaban dengan disclaimer generik");
     expect(prompt).toContain("bukan alasan untuk menolak pertanyaan konsep pajak umum");
     expect(prompt).toContain("Jangan menyimpulkan tanggal mulai berlakunya");
+    expect(prompt).toContain("Jangan menebak istilah antarmuka Coretax");
+    expect(prompt).toContain("Jawab sesuai ruang lingkup pertanyaan");
     expect(prompt).toContain("Jangan mengaku telah menelusuri web");
   });
 

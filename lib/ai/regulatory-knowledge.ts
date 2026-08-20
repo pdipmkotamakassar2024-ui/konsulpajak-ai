@@ -8,7 +8,7 @@ export interface RegulatoryEntry {
   officialSources: { label: string; url: string }[];
 }
 
-export const REGULATORY_KNOWLEDGE_VERSION = "2026-07-27";
+export const REGULATORY_KNOWLEDGE_VERSION = "2026-08-20";
 
 export const REGULATORY_KNOWLEDGE: RegulatoryEntry[] = [
   {
@@ -36,7 +36,6 @@ export const REGULATORY_KNOWLEDGE: RegulatoryEntry[] = [
     id: "spt-masa-pph-unifikasi-coretax",
     title: "SPT Masa PPh Unifikasi melalui Coretax DJP",
     reviewedAt: REGULATORY_KNOWLEDGE_VERSION,
-    effectiveFrom: "2025-01-01",
     keywords: [
       "pph unifikasi", "spt unifikasi", "spt masa unifikasi", "ebupot unifikasi",
       "e-bupot unifikasi", "bukti potong unifikasi", "apa itu unifikasi", "coretax unifikasi",
@@ -45,6 +44,7 @@ export const REGULATORY_KNOWLEDGE: RegulatoryEntry[] = [
       "SPT Masa PPh Unifikasi adalah satu SPT Masa yang dipakai Pemotong/Pemungut untuk melaporkan kewajiban pemotongan/pemungutan, penyetoran hasil pemotongan/pemungutan, dan/atau penyetoran sendiri atas beberapa jenis PPh dalam satu Masa Pajak.",
       "Cakupannya meliputi PPh Pasal 4 ayat (2), PPh Pasal 15, PPh Pasal 22, dan PPh Pasal 23/26. PPh Pasal 21 dan PPh Pasal 26 yang berkaitan dengan pekerjaan, jasa, atau kegiatan orang pribadi dilaporkan melalui SPT Masa PPh Pasal 21/26, bukan digabung secara umum ke SPT Masa PPh Unifikasi.",
       "Tujuan unifikasi adalah menyatukan pembuatan bukti potong/pungut dan pelaporan beberapa jenis PPh yang sebelumnya terpisah. PPh Unifikasi bukan jenis atau tarif pajak baru.",
+      "PPh Unifikasi sudah dikenal sebelum implementasi Coretax. Tanggal 1 Januari 2025 berkaitan dengan implementasi Coretax/prosedur dalam konteks ini, bukan tanggal lahir atau mulai berlakunya konsep PPh Unifikasi. Jangan pernah menyatakan 'PPh Unifikasi berlaku sejak 1 Januari 2025' kecuali sumber resmi khusus memang membuktikan klaim tersebut.",
       "Untuk masa pajak pada era Coretax, akses portal https://coretaxdjp.pajak.go.id lalu gunakan menu Surat Pemberitahuan (SPT), buat SPT, dan pilih jenis SPT PPh Unifikasi. Coretax menggunakan SPT Masa PPh Unifikasi untuk seluruh Wajib Pajak, tidak lagi dibedakan antara instansi pemerintah dan non-instansi pemerintah.",
       "Sejak PMK 81 Tahun 2024 berlaku, pembayaran/penyetoran masa untuk PPh yang dicakup diseragamkan paling lambat tanggal 15 bulan berikutnya; batas pelaporan SPT Masa PPh Unifikasi tetap paling lambat tanggal 20 bulan berikutnya. Jika jatuh tempo bertepatan dengan hari libur, ikuti ketentuan pergeseran ke hari kerja berikutnya.",
       "Jangan menjawab bahwa PPh Unifikasi mencakup PPh Pasal 21 secara umum. Jelaskan pengecualian PPh 21/26 orang pribadi agar pengguna tidak salah memilih SPT.",
@@ -164,6 +164,7 @@ export const REGULATORY_KNOWLEDGE: RegulatoryEntry[] = [
       "PP 20 Tahun 2026 mempertahankan tarif PPh Final UMKM 0,5% dan menajamkan penerimanya menjadi Wajib Pajak orang pribadi, perseroan perorangan, dan koperasi yang memenuhi ketentuan.",
       "Bagian omzet sampai Rp500 juta setahun yang tidak dikenai PPh Final hanya berlaku bagi Wajib Pajak orang pribadi, bukan otomatis bagi semua bentuk usaha.",
       "Contoh: toko online milik orang pribadi dengan omzet stabil Rp30 juta per bulan memiliki proyeksi omzet Rp360 juta setahun. Jika memenuhi syarat fasilitas PPh Final UMKM dan omzet kumulatif tahun berjalan belum melewati Rp500 juta, PPh Finalnya masih nihil. Jika usahanya berbentuk badan, kesimpulan ini tidak berlaku otomatis sehingga bentuk Wajib Pajak dan masa fasilitas harus diperiksa.",
+      "Jika omzet kumulatif Wajib Pajak orang pribadi melewati Rp500 juta dalam tahun berjalan, PPh Final 0,5% dikenakan mulai atas bagian omzet setelah ambang Rp500 juta sesuai mekanisme kumulatif; jangan menghitung 0,5% atas seluruh omzet setahun dan jangan menyebut batas 31 Maret sebagai jatuh tempo pembayaran bulanan.",
       "Pastikan menanyakan bentuk Wajib Pajak, omzet, jenis penghasilan, dan masa pemanfaatan fasilitas sebelum menyimpulkan kewajiban.",
     ],
     officialSources: [
