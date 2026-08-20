@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { GEMINI_MODEL_ID, GROQ_MODEL_ID, getGeminiGenerationSettings, getGroqGenerationSettings } from "@/lib/ai/generation-config";
+import { GEMINI_MODEL_ID, GROQ_MODEL_ID, GROQ_RESEARCH_MODEL_ID, getGeminiGenerationSettings, getGroqGenerationSettings, selectGroqModel, shouldUseLiveResearch } from "@/lib/ai/generation-config";
 
 describe("Gemini generation settings", () => {
   it("reserves the output budget for a visible answer", () => {
@@ -11,6 +11,27 @@ describe("Gemini generation settings", () => {
       thinkingBudget: 1_024,
       includeThoughts: false,
     });
+  });
+});
+
+describe("Groq model routing", () => {
+  it.each([
+    "Apa aturan pajak marketplace terbaru?",
+    "Apakah PMK ini masih berlaku saat ini?",
+    "Kapan batas pelaporan PPN sekarang?",
+    "Ada pengumuman DJP tahun 2026?",
+  ])("routes time-sensitive question to live research: %s", (query) => {
+    expect(shouldUseLiveResearch(query)).toBe(true);
+    expect(selectGroqModel(query)).toBe(GROQ_RESEARCH_MODEL_ID);
+  });
+
+  it.each([
+    "Apa itu PPh Unifikasi?",
+    "Hitung PPh Final konstruksi untuk kontrak 2,5 miliar",
+    "Bagaimana cara daftar NPWP online?",
+  ])("keeps stable or curated question on the high-capacity model: %s", (query) => {
+    expect(shouldUseLiveResearch(query)).toBe(false);
+    expect(selectGroqModel(query)).toBe(GROQ_MODEL_ID);
   });
 });
 

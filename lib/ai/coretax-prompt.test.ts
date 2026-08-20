@@ -72,5 +72,16 @@ describe("Coretax prompt", () => {
     expect(prompt).toContain("Jangan menyetujui koreksi pengguna");
     expect(prompt).toContain("Jangan menutup setiap jawaban dengan disclaimer generik");
     expect(prompt).toContain("bukan alasan untuk menolak pertanyaan konsep pajak umum");
+    expect(prompt).toContain("Jangan menyimpulkan tanggal mulai berlakunya");
+    expect(prompt).toContain("Jangan mengaku telah menelusuri web");
+  });
+
+  it("requires official sources when live research is enabled", () => {
+    const prompt = buildCoretaxSystemPrompt({ currentDate: "20 Agustus 2026", regulatoryContext: "FAKTA RESMI", liveResearch: true });
+
+    expect(prompt).toContain("Gunakan pencarian web sebelum menjawab");
+    expect(prompt).toContain("per 20 Agustus 2026");
+    expect(prompt).toContain("pajak.go.id");
+    expect(prompt).toContain("Jangan menjadikan blog");
   });
 });

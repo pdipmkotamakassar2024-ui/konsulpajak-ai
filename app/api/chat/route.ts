@@ -2,7 +2,7 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createGroq } from "@ai-sdk/groq";
 import { generateText, streamText, type ModelMessage } from "ai";
 import { buildCoretaxSystemPrompt } from "@/lib/ai/coretax-prompt";
-import { GEMINI_MODEL_ID, GROQ_MODEL_ID, getGeminiGenerationSettings, getGroqGenerationSettings } from "@/lib/ai/generation-config";
+import { GEMINI_MODEL_ID, getGeminiGenerationSettings, getGroqGenerationSettings, selectGroqModel, shouldUseLiveResearch } from "@/lib/ai/generation-config";
 import { buildCuratedFallbackAnswer, classifyAIProviderError } from "@/lib/ai/provider-fallback";
 import { buildRegulatoryContext } from "@/lib/ai/regulatory-knowledge";
 import type { ChatAttachment } from "@/lib/chat/types";
@@ -279,11 +279,18 @@ export async function POST(req: Request) {
 
   const recentQuestionContext = coreMessages.filter((message) => message.role === "user").slice(-4).map((message) => message.content).join("\n");
   const currentDate = new Intl.DateTimeFormat("id-ID", { dateStyle: "long", timeZone: "Asia/Makassar" }).format(new Date());
-  const system = buildCoretaxSystemPrompt({ currentDate, regulatoryContext: buildRegulatoryContext(recentQuestionContext) });
+  const liveResearch = Boolean(groqApiKey) && shouldUseLiveResearch(lastUserText);
+  const system = buildCoretaxSystemPrompt({
+    currentDate,
+    regulatoryContext: buildRegulatoryContext(recentQuestionContext),
+    liveResearch,
+  });
   const provider = groqApiKey ? "groq" : "google";
+  const groqModelId = selectGroqModel(lastUserText);
   const model = groqApiKey
-    ? createGroq({ apiKey: groqApiKey })(GROQ_MODEL_ID)
+    ? createGroq({ apiKey: groqApiKey })(groqModelId)
     : createGoogleGenerativeAI({ apiKey: googleApiKey })(GEMINI_MODEL_ID);
+  console.info("ai_request", { provider, model: groqApiKey ? groqModelId : GEMINI_MODEL_ID, liveResearch });
   const generationSettings = provider === "groq" ? getGroqGenerationSettings() : getGeminiGenerationSettings();
 
   let result: ReturnType<typeof streamText>;
