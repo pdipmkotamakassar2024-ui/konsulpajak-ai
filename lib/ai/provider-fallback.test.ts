@@ -7,6 +7,7 @@ describe("AI provider fallback", () => {
     expect(classifyAIProviderError(new Error("429 too many requests"))).toBe("AI_RATE_LIMIT");
     expect(classifyAIProviderError(new Error("API key invalid"))).toBe("AI_AUTH");
     expect(classifyAIProviderError(new Error("fetch failed ETIMEDOUT"))).toBe("AI_NETWORK");
+    expect(classifyAIProviderError({ cause: { statusCode: 503, message: "Internal server error" } })).toBe("AI_MODEL_UNAVAILABLE");
   });
 
   it("answers marketplace questions from curated sources during an outage", () => {

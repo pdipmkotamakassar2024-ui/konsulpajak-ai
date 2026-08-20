@@ -8,9 +8,10 @@ export type AIProviderErrorCode =
   | "AI_NETWORK"
   | "AI_UNKNOWN";
 
-function errorDetails(error: unknown) {
-  if (!error || typeof error !== "object") return String(error || "");
+function errorDetails(error: unknown, depth = 0): string {
+  if (!error || typeof error !== "object" || depth > 3) return String(error || "");
   const candidate = error as {
+    name?: unknown;
     message?: unknown;
     status?: unknown;
     statusCode?: unknown;
@@ -18,11 +19,12 @@ function errorDetails(error: unknown) {
     cause?: unknown;
   };
   return [
+    candidate.name,
     candidate.status,
     candidate.statusCode,
     candidate.message,
     candidate.responseBody,
-    candidate.cause instanceof Error ? candidate.cause.message : candidate.cause,
+    errorDetails(candidate.cause, depth + 1),
   ].map(String).join(" ").toLowerCase();
 }
 
@@ -31,7 +33,7 @@ export function classifyAIProviderError(error: unknown): AIProviderErrorCode {
   if (/billing|credit|quota.*(exceed|exhaust)|resource_exhausted/.test(details)) return "AI_BILLING_OR_QUOTA";
   if (/rate.?limit|too many requests|429/.test(details)) return "AI_RATE_LIMIT";
   if (/api.?key|unauth|permission|forbidden|401|403/.test(details)) return "AI_AUTH";
-  if (/model.*(not found|unavailable)|404|503|overloaded|capacity/.test(details)) return "AI_MODEL_UNAVAILABLE";
+  if (/model.*(not found|unavailable)|404|500|503|internal.*(error|server)|overloaded|capacity/.test(details)) return "AI_MODEL_UNAVAILABLE";
   if (/network|fetch failed|econn|enotfound|etimedout|timeout|socket/.test(details)) return "AI_NETWORK";
   return "AI_UNKNOWN";
 }
