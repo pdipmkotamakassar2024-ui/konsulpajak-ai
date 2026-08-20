@@ -159,10 +159,11 @@ export const REGULATORY_KNOWLEDGE: RegulatoryEntry[] = [
     title: "PPh Final UMKM berdasarkan PP 20 Tahun 2026",
     reviewedAt: REGULATORY_KNOWLEDGE_VERSION,
     effectiveFrom: "2026-01-01",
-    keywords: ["umkm", "0,5%", "0.5%", "pp 20", "omzet 500 juta", "pph final", "koperasi", "perseroan perorangan"],
+    keywords: ["umkm", "0,5%", "0.5%", "pp 20", "omzet", "omset", "omzet 500 juta", "pph final", "koperasi", "perseroan perorangan", "toko online", "usaha online", "usaha kecil", "pajak toko"],
     facts: [
       "PP 20 Tahun 2026 mempertahankan tarif PPh Final UMKM 0,5% dan menajamkan penerimanya menjadi Wajib Pajak orang pribadi, perseroan perorangan, dan koperasi yang memenuhi ketentuan.",
       "Bagian omzet sampai Rp500 juta setahun yang tidak dikenai PPh Final hanya berlaku bagi Wajib Pajak orang pribadi, bukan otomatis bagi semua bentuk usaha.",
+      "Contoh: toko online milik orang pribadi dengan omzet stabil Rp30 juta per bulan memiliki proyeksi omzet Rp360 juta setahun. Jika memenuhi syarat fasilitas PPh Final UMKM dan omzet kumulatif tahun berjalan belum melewati Rp500 juta, PPh Finalnya masih nihil. Jika usahanya berbentuk badan, kesimpulan ini tidak berlaku otomatis sehingga bentuk Wajib Pajak dan masa fasilitas harus diperiksa.",
       "Pastikan menanyakan bentuk Wajib Pajak, omzet, jenis penghasilan, dan masa pemanfaatan fasilitas sebelum menyimpulkan kewajiban.",
     ],
     officialSources: [
@@ -174,13 +175,16 @@ export const REGULATORY_KNOWLEDGE: RegulatoryEntry[] = [
     title: "Jatuh tempo pembayaran pajak masa",
     reviewedAt: REGULATORY_KNOWLEDGE_VERSION,
     effectiveFrom: "2025-01-01",
-    keywords: ["jatuh tempo", "batas bayar", "batas setor", "pph 21", "tanggal 10", "tanggal 15", "pmk 81"],
+    keywords: ["jatuh tempo", "batas bayar", "batas setor", "batas lapor", "batas pelaporan", "pelaporan ppn", "pelaporan pph 21", "pph 21", "tanggal 10", "tanggal 15", "tanggal 20", "pmk 81"],
     facts: [
       "PMK 81 Tahun 2024 menyeragamkan jatuh tempo pembayaran atau penyetoran banyak jenis pajak masa, termasuk PPh Pasal 21, menjadi paling lambat tanggal 15 bulan berikutnya.",
+      "SPT Masa PPh Pasal 21/26 dilaporkan paling lambat tanggal 20 bulan berikutnya setelah Masa Pajak berakhir.",
+      "SPT Masa PPN bagi PKP dilaporkan paling lambat akhir bulan berikutnya setelah Masa Pajak berakhir dan tetap wajib disampaikan walaupun tidak ada penyerahan BKP/JKP. PPN kurang bayar disetor paling lambat akhir bulan berikutnya sebelum SPT Masa PPN disampaikan.",
       "Jangan lagi menyebut tanggal 10 sebagai batas setor PPh Pasal 21 untuk masa pajak yang tunduk pada ketentuan baru.",
     ],
     officialSources: [
       { label: "DJP — Penyederhanaan Jatuh Tempo Pembayaran", url: "https://www.pajak.go.id/id/berita/pemerintah-sederhanakan-jatuh-tempo-pembayaran-pajak-lewat-peraturan-menkeu" },
+      { label: "DJP — SPT Masa PPN", url: "https://www.pajak.go.id/panduan-layanan-pajak/konten/pelaporan/2025/badan/spt/spt-masa-ppn" },
     ],
   },
 ];

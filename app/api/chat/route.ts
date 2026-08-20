@@ -2,6 +2,7 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateText, streamText, type ModelMessage } from "ai";
 import { buildCoretaxSystemPrompt } from "@/lib/ai/coretax-prompt";
 import { GEMINI_MODEL_ID, getGeminiGenerationSettings } from "@/lib/ai/generation-config";
+import { buildCuratedFallbackAnswer, classifyAIProviderError } from "@/lib/ai/provider-fallback";
 import { buildRegulatoryContext } from "@/lib/ai/regulatory-knowledge";
 import type { ChatAttachment } from "@/lib/chat/types";
 import { validateAndDecodeAttachments, type ValidatedAttachment } from "@/lib/chat/server-attachments";
@@ -327,9 +328,19 @@ export async function POST(req: Request) {
           await admin.from("chats").update({ updated_at: new Date().toISOString() }).eq("id", chatId).eq("user_id", user.id);
         }
       } catch (error) {
-        console.error("ai_stream_failed", error);
+        const providerErrorCode = classifyAIProviderError(error);
+        console.error("ai_stream_failed", { providerErrorCode, error });
         await releaseQuota(admin, usageEventId).catch((releaseError) => console.error("quota_release_failed", releaseError));
-        controller.enqueue(encoder.encode("\n\nLayanan AI sedang tidak tersedia. Kuota Anda tidak dikurangi; silakan coba lagi atau hubungi admin."));
+        if (!fullText.trim()) {
+          const fallback = buildCuratedFallbackAnswer(lastUserText);
+          if (fallback) {
+            controller.enqueue(encoder.encode(fallback));
+          } else {
+            controller.enqueue(encoder.encode(`Layanan AI utama sedang tidak tersedia dan belum ada jawaban cadangan terkurasi untuk pertanyaan ini. Kuota Anda tidak dikurangi. Kode gangguan: ${providerErrorCode}.`));
+          }
+        } else {
+          controller.enqueue(encoder.encode(`\n\n> [!WARNING]\n> Jawaban terhenti karena gangguan layanan AI. Kuota Anda tidak dikurangi. Kode gangguan: ${providerErrorCode}.`));
+        }
       } finally {
         controller.close();
       }
